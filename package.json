@@ -1,0 +1,25 @@
+{
+  "name": "kameradbot",
+  "version": "1.0.0",
+  "description": "Personal discord bot to do what ever I think of.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Merecski/KameradBot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Merecski/KameradBot/issues"
+  },
+  "homepage": "https://github.com/Merecski/KameradBot#readme",
+  "dependencies": {
+    "@discordjs/rest": "^0.2.0-canary.0",
+    "discord-api-types": "^0.26.1",
+    "discord.js": "^13.6.0",
+    "dotenv": "^14.2.0"
+  }
+}
