@@ -1,10 +1,18 @@
 {
   "name": "kameradbot",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Personal discord bot to do what ever I think of.",
   "main": "index.js",
+  "type": "module",
+  "imports": {
+    "#utils/*": "./utilities/*.js",
+    "#cmd/*": "./commands/*.js",
+    "#root/*": "*.js"
+  },
   "scripts": {
-    "start": "node index.js"
+    "register": "node deploy-commands.js",
+    "start": "node index.js",
+    "dev": "nodemon --exec 'npm start'"
   },
   "repository": {
     "type": "git",
@@ -20,6 +28,11 @@
     "@discordjs/rest": "^0.2.0-canary.0",
     "discord-api-types": "^0.26.1",
     "discord.js": "^13.6.0",
-    "dotenv": "^14.2.0"
+    "dotenv": "^14.2.0",
+    "mariadb": "^2.5.5",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
   }
 }
