@@ -27,8 +27,14 @@ class BasedCounter {
          this.client.on('messageReactionAdd', async (reaction, user) => {
             if (user.bot || await checkPartial(reaction)) return
             if (config.debug && reaction.message.channel.name !== 'bot-testing') return
-            if (user.author === reaction.author) return
+            if (!config.debug && user.author === reaction.author) return
             this.handleBasedReactions(reaction)
+        });
+
+        this.client.on('messageCreate', async msg => {
+            if (msg.author.bot || await checkPartial(msg)) return
+            if (config.debug && msg.channel.name !== 'bot-testing') return
+            this.handleBasedMsgs(msg)
         });
     }
 
@@ -92,7 +98,7 @@ class BasedCounter {
         }
     }
 
-    async handleBasedReactions(reaction) {
+    handleBasedReactions(reaction) {
         if (reaction.emoji.name === 'based') {
             this.add(reaction.message);
             console.debug("Updated counter: ", this.based)

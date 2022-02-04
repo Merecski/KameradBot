@@ -8,14 +8,16 @@ import path from 'path'
 // TODO Maybe re-add this later?
 const test = config.debug ? 'test_' : ''
 
+/**
+ * Dynamically loads in command modules. This allows for last minute modificaitons
+ * or ignore list from config.
+ * @param {String} guildIDs Array of strings pertaining to the guild's ID to register to
+ */
 export default async function registerCommands(guildIDs) {
-	/**
-	 * Dynamically loads in command modules. This allows for last minute modificaitons
-	 * or ignore list from config.
-	 */
+    const absolutePath = path.resolve('./commands');
 	console.log('Not loading modules:', config.ignoreModules)
 	var cmds = []
-	var files = await fs.readdir('./commands')
+	var files = await fs.readdir(absolutePath)
 	files = files.filter(filename => {
 		// Remove ignored modules
 		const file = path.parse(filename)
@@ -23,7 +25,7 @@ export default async function registerCommands(guildIDs) {
 	})
 	for (const file of files) {
 		// Add all .js modules with commands into main list
-		const { commands } = await import('./commands/' + file)
+		const { commands } = await import(path.join(absolutePath, file))
 		if (commands) cmds = cmds.concat(commands)
 	}
 	
