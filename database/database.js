@@ -37,10 +37,17 @@ function createConnection() {
             reject(err);
         }
     })
+
+    process.on('SIGINT', function() {
+        console.log("\nDisconnecting MySQL...")
+        conn.end()
+        console.log("Exiting...")
+    });
+
     return conn
 }
 
-const connectToDB = new Promise(func) ((resolve, reject) => {
+const connectToDB = new Promise((resolve, reject) => {
     const conn = mysql.createConnection({
         host:     config.db.host,
         // port:     '/var/run/mysqld/mysqld.sock',
@@ -76,6 +83,31 @@ const connectToDB = new Promise(func) ((resolve, reject) => {
     resolve(conn)
 });
 
+function createPool() {
+    const pool = mysql.createPool({
+        connectionLimit : 100, //important
+        host:     config.db.host,
+        // port:     '/var/run/mysqld/mysqld.sock',
+        port:     3306,
+        user:     config.db.user,
+        password: config.db.pass,
+        database: config.db.database,
+        connectTimeout: 1000,
+    });
+
+    pool.on('connect', () => {
+        console.log('MySQL pool connected...')
+    })
+
+    // process.on('SIGINT', function() {
+    //     console.log("\nDisconnecting MySQL...")
+    //     pool.end()
+    //     console.log("Exiting.")
+    //     process.exit()
+    // });
+
+    return pool
+}
 
 function getUserCoumns(conn) {
     conn.query('SHOW COLUMNS FROM User', (err, results, fields) => {
@@ -86,7 +118,7 @@ function getUserCoumns(conn) {
 
 function addUser(conn, userid, username, bot) {
     console.log("Adding:", userid, username, bot)
-    conn.query("INSERT INTO User VALUE (?, ?, ?) ", [userid, username, bot], (err, results) => {
+    conn.query("INSERT INTO users VALUE (?, ?, ?) ", [userid, username, bot], (err, results) => {
         if (err.code === 'ER_DUP_ENTRY') console.log("Duplicate user entry ignored")
         else if (err) console.error(err);
         else console.log("addUser 1 results:\n", results)
@@ -101,8 +133,8 @@ function addUser(conn, userid, username, bot) {
 }
 
 function getUsers(conn) {
-    conn.query("SELECT * FROM User", (err, results, fields) => {
-        if (err)
+    conn.query("SELECT * FROM users", (err, results, fields) => {
+        if (err) throw err
         console.log("getUsers results:")
         results.forEach( user => {
             console.log(user)
@@ -110,21 +142,55 @@ function getUsers(conn) {
     })
 }
 
-process.on('SIGINT', function() {
-    console.log("\nDisconnecting MySQL...")
-    conn.end()
-    console.log("Exiting...")
-});
+class Database {
+    constructor( config ) {
+        this.pool = mysql.createPool({
+            connectionLimit : 10, //important
+            host:     config.db.host,
+            // port:     '/var/run/mysqld/mysqld.sock',
+            port:     3306,
+            user:     config.db.user,
+            password: config.db.pass,
+            database: config.db.database,
+            connectTimeout: 1000,
+        });
+    }
+    query( sql, args ) {
+        return new Promise( ( resolve, reject ) => {
+            this.pool.query( sql, args, ( err, rows ) => {
+                if ( err ) return reject( err );
+                resolve( rows );
+            } );
+        } );
+    }
+    close() {
+        return new Promise( ( resolve, reject ) => {
+            this.pool.end( err => {
+                if ( err ) return reject( err );
+                resolve();
+            } );
+        } );
+    }
+}
 
 //DEMO
 if (import.meta.url === `file://${process.argv[1]}`) {
-    connectToDB.then(conn => {
+    // connectToDB.then(conn => {
+    //     getUsers(conn)
+    //     conn.end()
+    // })
+    const pool = createPool()
+    pool.getConnection((err, conn) => {
         getUsers(conn)
-        conn.end()
+        conn.release()
     })
+    pool.end()
 }
 
+const pool = createPool()
+
 export {
+    pool,
     addUser,
     getUsers
 }

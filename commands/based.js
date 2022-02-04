@@ -1,35 +1,87 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
+import { checkPartial } from '#utils/utils'
+import { config } from '#utils/config'
+
 
 class BasedCounter {
     constructor(client) {
+        import('../database/database.js').then(db => {
+            this.pool = db.pool;
+            this.loadData();
+        })
         this.based = new Object();
         this.client = client;
+        this.registerCommands();
+    }
+
+    // Register all realated interactions
+    registerCommands() {
+         this.client.on('interactionCreate', async interaction => {
+            if (!interaction.isCommand()) return;
+        	const { commandName } = interaction;
+            if (commandName === 'basedcount') {
+                interaction.reply({content: `Based counter: ${this.count(interaction.user.id)}`, ephemeral: true})
+            }
+        })
+    
+         this.client.on('messageReactionAdd', async (reaction, user) => {
+            if (user.bot || await checkPartial(reaction)) return
+            if (config.debug && reaction.message.channel.name !== 'bot-testing') return
+            if (user.author === reaction.author) return
+            this.handleBasedReactions(reaction)
+        });
+    }
+
+    // Load based data from database
+    loadData() {
+        this.pool.query("SELECT * FROM based", (err, result, fields) => {
+            if (err) throw err
+            const tmp = JSON.parse(JSON.stringify(result))
+            console.log('Loaded based data:', tmp)
+            for (const user of tmp) {
+                this.based[user.userid] = user.count;
+            }
+        })
+    }
+
+    // Update database for specific user
+    update(id) {
+        console.log(`Updating user ${id} with count ${this.count(id)}`)
+        this.pool.query(`UPDATE based SET count = ${this.count(id)} WHERE userid = '${id}'`, (err, result, fields) => {
+            if (err) throw err
+        })
     }
 
     add(msg) {
-        let name = msg.author.username;
-        if (typeof name !== "string") return;
-        if (name in this.based) {
-            this.based[name] += 1;
+        let id = msg.author.id;
+        if (typeof id !== "string") return;
+        if (id in this.based) {
+            this.based[id] += 1;
         } else {
-            this.based[name] = 1;
+            this.pool.query(`INSERT INTO based (userid, count) VALUES ('${id}', 1)`, (err) => {
+                if (err) throw err
+            })
+            this.based[id] = 1;
             msg.reply(`Congratulations ${msg.author.username} your first based content!`);
         }
-        if (this.based[name] && this.based[name] % 100 === 0) {
-            msg.reply(`Your based counter has reached ${this.based[name]}`);
+        if (this.based[id] && this.based[id] % 100 === 0) {
+            msg.reply(`Your based counter has reached ${this.based[id]}`);
         }
+        this.update(id)
     }
 
-    remove(name) {
-        if (name in this.based) {
-            this.based[name] -= 1;
+    remove(id) {
+        if (id in this.based) {
+            this.based[id] -= 1;
         } else {
-            this.based[name] = 0;
+            this.based[id] = 0;
         }
     }
 
-    count(name) {
-        return this.based[name] ? this.based[name] : 0;
+    count(id) {
+        console.log('Getting count for', id)
+        console.log(this.based)
+        return this.based[id] ? this.based[id] : 0;
     }
 
     async handleBasedMsgs(msg) {
@@ -51,12 +103,8 @@ class BasedCounter {
 const commands = [
     new SlashCommandBuilder().setName('basedcount').setDescription('Replies with user total based count.'),
 ]
-function execute(interaction) {
-    interaction.reply({content: `Based counter: ${based.count(interaction.user.username)}`, ephemeral: true})
-}
 
 export {
     BasedCounter,
-    commands,
-    execute
+    commands
 };
