@@ -1,18 +1,29 @@
 import { config, token } from '#utils/config'
 import { checkPartial } from '#utils/utils'
-import { BasedCounter } from '#cmd/based'
-import { Client, Intents } from 'discord.js'
+import { Client, Intents, InteractionCollector } from 'discord.js'
 import registerCommands from './deploy-commands.js'
+
+import { BasedCounter } from './commands/based.js'
+import { YoutubePlayer } from "./commands/youtube.js";
+import { registerMohaa } from "./commands/mohaa.js";
+
 
 if (!config.debug || config.reloadRequired) import('./deploy-commands.js')
 
 const client = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
+    intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_VOICE_STATES,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS
+    ],
     partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
 });
 
 // Loads all client responses
 const based = new BasedCounter(client);
+const yt = new YoutubePlayer(client);
+registerMohaa(client);
 
 function logHeader(msg) {
     return `[${msg.guild.name}][${msg.channel.name}]`
@@ -30,7 +41,7 @@ client.on('interactionCreate', async interaction => {
 		await interaction.reply(`Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`);
 	} else if (commandName === 'user') {
 		await interaction.reply(`Your tag: ${interaction.user.tag}\nYour id: ${interaction.user.id}`);
-	}
+    }
 });
 
 // Module event setup

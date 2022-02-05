@@ -6,6 +6,7 @@ var commands = [
 	new SlashCommandBuilder().setName('ping').setDescription('Replies with pong!'),
 	new SlashCommandBuilder().setName('server').setDescription('Replies with server info!'),
 	new SlashCommandBuilder().setName('user').setDescription('Replies with user info!'),
+	new SlashCommandBuilder().setName('test').setDescription('Pre-registered command that could be used for anything dev related'),
 ]
 
 function interactions(client) {

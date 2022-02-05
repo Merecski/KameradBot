@@ -28,13 +28,13 @@ export default async function registerCommands(guildIDs) {
 		const { commands } = await import(path.join(absolutePath, file))
 		if (commands) cmds = cmds.concat(commands)
 	}
-	
+
 	// Convert all commands to json to prep for registration
 	cmds = cmds.map(command => command.toJSON())
 	console.log("All avaliable commands:", cmds.map(c => c.name))
-	
+
 	const rest = new REST({ version: '9' }).setToken(token);
-	
+
 	for (const guildID of guildIDs) {
 		(async () => {
 			try {
