@@ -5,7 +5,16 @@ import {
     getVoiceConnection
 } from '@discordjs/voice';
 import { SlashCommandBuilder } from '@discordjs/builders'
+import play from 'play-dl'
 
+// This is necessary to stream anything from SoundCloud
+play.getFreeClientID().then((clientID) => {
+    play.setToken({
+      soundcloud : {
+          client_id : clientID
+      }
+    })
+})
 
 const dispatcher = {}
 
@@ -41,6 +50,10 @@ function connect(channel, stream, options) {
                     inputType: options
                 });
             player.play(resource);
+            player.on("error", (error) => {
+                connection.destroy()
+                console.error('Player broke :(', error)
+            })
 
             const connection = joinVoiceChannel({
                 channelId: channel.id,
@@ -93,6 +106,15 @@ function addPlayerListeners(player, connection) {
             connection.destroy()
         }
     });
+}
+
+function validateYouTubeUrl(url) {
+    if (url != undefined || url != '') {
+        var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/;
+        var match = url.match(regExp);
+        if(match && match[2].length == 11) return true;
+    }
+    return false
 }
 
 const commands = [
