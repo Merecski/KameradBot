@@ -6,6 +6,9 @@ import registerCommands from './deploy-commands.js'
 import { BasedCounter } from './commands/based.js'
 import { YoutubePlayer } from "./commands/youtube.js";
 import { registerMohaa } from "./commands/mohaa.js";
+import { registerIntros } from "./commands/playintro.js";
+import { registerVoiceCommands } from "./voice/voice.js";
+import registerSecret from "./commands/secret.js";
 
 
 if (!config.debug || config.reloadRequired) import('./deploy-commands.js')
@@ -24,6 +27,9 @@ const client = new Client({
 const based = new BasedCounter(client);
 const yt = new YoutubePlayer(client);
 registerMohaa(client);
+registerIntros(client);
+registerVoiceCommands(client);
+registerSecret(client);
 
 function logHeader(msg) {
     return `[${msg.guild.name}][${msg.channel.name}]`
@@ -67,4 +73,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
     console.debug(`${logHeader(reaction.message)} ${user.username} reacted to ${reaction.message.author.username} with ${reaction.emoji.name}`)
 });
 
-client.login(token);
+
+
+try {
+    client.login(token);
+} catch(error) {
+    console.error('The client crashed :(', error)
+}

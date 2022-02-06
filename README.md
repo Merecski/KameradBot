@@ -35,6 +35,19 @@ DB_PASS is something you'll have to decide when setting up the database.
     - This should create a basic database and table up and running
 1. Run the bash script `start.sh` to get the bot running
 
+## Issues
+
+- As of version ytdl-core v4.8.0, it does not work. After a minute or two the connection will reset
+
+# Extra
 
 ## TODO 
 Do more 
+
+## Progress notes
+
+### 2/5
+- Player keeps breaking because of `connResetException (node:internal/errors:691:14)`
+    - Main ytdl-core [issue](https://github.com/fent/node-ytdl-core/issues/902)
+    - People refrencing issue and possible [solution](https://github.com/NovaLynxie/CoraBot_Main/issues/21)
+        - This fixed my issue

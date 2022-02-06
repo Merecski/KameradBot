@@ -1,3 +1,8 @@
 node_modules/*
 .env
 .mysql.*
+*secret.*
+secret/*
+*.mp3
+*.wav
+*.WAV

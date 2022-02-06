@@ -51,3 +51,9 @@ export default async function registerCommands(guildIDs) {
 		})();
 	}
 }
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+	const guildIds = [ config.guildID ];
+	// const guildIds = [ '313843359091392512' ];
+	registerCommands(guildIds)
+}

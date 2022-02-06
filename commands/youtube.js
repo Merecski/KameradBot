@@ -4,10 +4,15 @@ import {
     createAudioResource, 
     getVoiceConnection,
     VoiceConnectionStatus,
+    NoSubscriberBehavior,
     entersState 
 } from '@discordjs/voice';
 import { SlashCommandBuilder } from '@discordjs/builders'
-import ytdl from 'ytdl-core-discord';
+import yt from 'ytdl-core-discord';
+import { connect } from '../voice/voice.js'
+
+
+// import ytdl from 'ytdl-core';
 import play from 'play-dl'
 
 class YoutubePlayer {
@@ -33,26 +38,41 @@ class YoutubePlayer {
                 return
            }
 
-           if (commandName == 'test') {
-                console.log("runnning test command")
-                this.joinChanneltest(voiceChannel)
-                interaction.reply('playing...')
-                this.play(voiceChannel, 'not used');
-            } else if (commandName === 'play') {
-                interaction.reply('playing...')
-                console.log(`Connecting to ${member.voice.channel.name} with ${member.user.tag} !`);
+           if (commandName == 'testIgnore') {
+                console.log("runnning test command");
                 this.joinChanneltest(voiceChannel);
-                this.play(voiceChannel, interaction.options.getString('url'));
-            } else if (commandName === 'pause') {
-                interaction.reply('paused.')
-                this.pause(voiceChannel)
-            } else if (commandName === 'resume') {
-                this.resume(voiceChannel)
-                interaction.reply('resuming...')
-            } else if (commandName === 'stop') {
-                interaction.reply('stopped.')
-                this.stop(voiceChannel);
-            }
+                interaction.reply('playing...');
+                this.createPlayer(voiceChannel, this.testurl);
+                // this.play(voiceChannel, this.testurl);
+            } else if (commandName === 'play') {
+                if (interaction.options.getSubcommand() === 'url') {
+                    interaction.reply(`Playing `)
+                    console.log(`Connecting to ${member.voice.channel.name} with ${member.user.tag} !`);
+                    // this.joinChannel(voiceChannel);
+                    this.createPlayer(voiceChannel, interaction.options.getString('url'));
+                } else if (interaction.options.getSubcommand() === 'search') {
+                    interaction.reply('playing...')
+                    console.log(`Connecting to ${member.voice.channel.name} with ${member.user.tag} !`);
+                    this.joinChanneltest(voiceChannel);
+                    const searchWords = await this.search(interaction.options.getString('search'))
+                    if (searchWords) {
+                        this.createPlayer(voiceChannel, searchWords);
+                    } else {
+                        console.log('failed')
+                    }
+                }
+
+            } 
+            // else if (commandName === 'pause') {
+            //     interaction.reply({content: 'paused' , ephemeral: true})
+            //     this.pause(voiceChannel)
+            // } else if (commandName === 'resume') {
+            //     this.resume(voiceChannel)
+            //     interaction.reply({content: 'resuming...', ephemeral: true})
+            // } else if (commandName === 'stop') {
+            //     interaction.reply({content: 'stopped.', ephemeral: true})
+            //     this.stop(voiceChannel);
+            // }
        })
    }
 
@@ -94,27 +114,62 @@ class YoutubePlayer {
             adapterCreator: channel.guild.voiceAdapterCreator,
         });
         connection.on('stateChange', (oldState, newState) => {
-            console.log(`Connection transitioned from ${oldState.status} to ${newState.status}`);
+            console.log(`Connection[${connection.joinConfig.guildId}] transitioned from ${oldState.status} to ${newState.status}`);
         });
     }
 
-    async play(chan, url) {
+    async playBROKEN(chan, url) {
         const connection = getVoiceConnection(this.getID(chan))
-        if (!connection) return
+        // yt(this.testurl).pipe(fs.createWriteStream('video.mp4'));
+        const stream = await yt(url, {filter: "audioonly"})
         const player = createAudioPlayer();
-        const stream = await ytdl(url, {filter: "audioonly"})
         const resource = createAudioResource(stream);
         player.play(resource);
         player.on('stateChange', (oldState, newState) => {
             console.log(`AudioPlayer traitioned from ${oldState.status} to ${newState.status}`);
         });
+        player.on("error", (error) => {
+            connection.destroy()
+            console.error('Player broke :(', error)
+        })
         connection.subscribe(player)
-        console.log('player.subscribers', player.subscribers)
         this.dispatcher[connection.joinConfig.guildId] = player;
     }
 
-    createPlayer() {
+    async createPlayer(chan, url) {
+        // const connection = getVoiceConnection(this.getID(chan))
+        let stream = await play.stream(url)
+        connect(chan, stream.stream, stream.type)
+            .then(() => { console.log('playing youtube video')})
+            .catch(error => { console.error(error)})
+        // let resource = createAudioResource(stream.stream, { 
+        //     inputType: stream.type
+        // })
+        // let player = createAudioPlayer({
+        //     behaviors: {
+        //         noSubscriber: NoSubscriberBehavior.Play
+        //     }
+        // })
+        // player.on("error", (error) => {
+        //     connection.destroy()
+        //     console.error('Player broke :(', error)
+        // })
+        // player.play(resource)
+        // connection.subscribe(player)
+        // this.dispatcher[connection.joinConfig.guildId] = player;
+    }
 
+    async search(args) {
+        console.log(`Searching YouTube for: '${args}'`)
+        let yt_info = await play.search(args, { limit: 5 })
+        if (yt_info.length === 0) {
+            console.log('FAILED TO FIND A VIDEO?')
+            return ''
+        }
+        // TODO HANDLE FAILED SERACHES
+
+        console.log(`Found video: ${yt_info}`)
+        return yt_info[0].url
     }
 
     getPlayer(chan) {
@@ -148,14 +203,11 @@ class YoutubePlayer {
 }
 
 const commands = [
-    new SlashCommandBuilder()
-        .setName('play')
-        .setDescription('Plays a Youtube video')
-        .addStringOption(option => option.setName('url').setDescription('Enter youtube url').setRequired(true)),
-    new SlashCommandBuilder().setName('stop').setDescription('Stops player'),
-    new SlashCommandBuilder().setName('queue').setDescription('Adds video to queue'),
-    new SlashCommandBuilder().setName('pause').setDescription('Pause audio'),
-    new SlashCommandBuilder().setName('resume').setDescription('Resume audio'),
+    new SlashCommandBuilder().setName('play').setDescription('Plays a Youtube video')
+        .addSubcommand(subcommand => subcommand.setName('url').setDescription('url link to video')
+            .addStringOption(option => option.setName('url').setDescription('Enter youtube url').setRequired(true)))
+        .addSubcommand(subcommand => subcommand.setName('search').setDescription('search term for video')
+            .addStringOption(option => option.setName('search').setDescription('Enter keywordsl').setRequired(true))),
 ]
 
 export {

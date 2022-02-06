@@ -1,8 +1,4 @@
-import { 
-    joinVoiceChannel, 
-    createAudioPlayer, 
-    createAudioResource
-} from '@discordjs/voice';
+import { connect } from '../voice/voice.js'
 import { SlashCommandBuilder } from '@discordjs/builders';
 
 import fs from 'fs/promises';
@@ -14,61 +10,33 @@ const american = './sound/mohaa/a';
 function registerMohaa(client) {
     client.on('interactionCreate', interaction => {
         if (!interaction.isCommand()) return;
-            const { commandName } = interaction;
-            const guild = client.guilds.cache.get(interaction.guildId); // Getting the guild.
-            const member = guild.members.cache.get(interaction.user.id); // Getting the member.
-            const voiceChannel = member.voice.channel
-            if (!voiceChannel) {
-                    console.log(`${member.user.tag} is not connected.`);
-                    return
+        const { commandName } = interaction;
+        const guild = client.guilds.cache.get(interaction.guildId); // Getting the guild.
+        const member = guild.members.cache.get(interaction.user.id); // Getting the member.
+        const voiceChannel = member.voice.channel
+        if (!voiceChannel) {
+                console.log(`${member.user.tag} is not connected.`);
+                return
+        }
+        if (commandName == 'mohaa') {
+            if (interaction.options.getSubcommand() === 'american') {
+                console.log('Playing American audio')
+                playRandomAmericanMohaa(voiceChannel).then( name => {
+                    interaction.reply({content: `Playing: ${name}`, ephemeral: true})
+                })
+            } else if (interaction.options.getSubcommand() === 'german') {
+                console.log('Playing German audio')
+                playRandomGermanMohaa(voiceChannel).then( name => {
+                    interaction.reply({content: `Playing: ${name}`, ephemeral: true})
+                })
+            } else {
+                console.log('Playing Random audio')
+                playRandomMohaa(voiceChannel).then( name => {
+                    interaction.reply({content: `Playing: ${name}`, ephemeral: true})
+                })
             }
-            if (commandName == 'mohaa') {
-                if (interaction.options.getSubcommand() === 'american') {
-                    console.log('Playing American audio')
-                    playRandomAmericanMohaa(voiceChannel).then( name => {
-                        interaction.reply({content: `Playing: ${name}`, ephemeral: true})
-                    })
-                } else if (interaction.options.getSubcommand() === 'german') {
-                    console.log('Playing German audio')
-                    playRandomGermanMohaa(voiceChannel).then( name => {
-                        interaction.reply({content: `Playing: ${name}`, ephemeral: true})
-                    })
-                } else {
-                    console.log('Playing Random audio')
-                    playRandomMohaa(voiceChannel).then( name => {
-                        interaction.reply({content: `Playing: ${name}`, ephemeral: true})
-                    })
-                }
-            }
-        })
-}
-
-function connect(channel, file) {
-    return new Promise((resolve, reject) => {
-        try {
-            const connection = joinVoiceChannel({
-                channelId: channel.id,
-                guildId: channel.guild.id,
-                adapterCreator: channel.guild.voiceAdapterCreator,
-            });
-            const player = createAudioPlayer();
-            console.log(`Playing file ${file}`)
-            const resource = createAudioResource(file);
-            player.play(resource);
-            connection.subscribe(player)
-            player.on('stateChange', (oldState, newState) => {
-                console.log(`AudioPlayer transitioned from ${oldState.status} to ${newState.status}`);
-                if (newState.status === 'idle') {
-                    player.stop()
-                    connection.destroy()
-                }
-            });
-            resolve()
-        } catch (error) {
-            reject(error)
         }
     })
-
 }
 
 async function americanFiles() {

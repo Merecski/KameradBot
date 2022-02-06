@@ -27,7 +27,7 @@ class BasedCounter {
          this.client.on('messageReactionAdd', async (reaction, user) => {
             if (user.bot || await checkPartial(reaction)) return
             if (config.debug && reaction.message.channel.name !== 'bot-testing') return
-            if (!config.debug && user.author === reaction.author) return
+            // if (!config.debug && user.author === reaction.author) return
             this.handleBasedReactions(reaction)
         });
 
