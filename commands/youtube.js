@@ -43,7 +43,6 @@ class YoutubePlayer {
             } else if (commandName === 'play') {
                 if (interaction.options.getSubcommand() === 'url') {
                     console.log(`Connecting to ${member.voice.channel.name} with ${member.user.tag} !`);
-                    // this.joinChannel(voiceChannel);
                     this.createPlayer(voiceChannel, interaction.options.getString('url'))
                         .then((res) => {
                             interaction.reply(`Playing ${interaction.options.getString('url')}`)

@@ -3,11 +3,45 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 
 import fs from 'fs/promises';
 import path from 'path';
+import glob from 'glob';
 
-const german = './sound/mohaa/g';
-const american = './sound/mohaa/a';
+const germanDir = './sound/mohaa/g';
+const americanDir = './sound/mohaa/a';
+var germanAudio = {}
+var americanAudio = {}
+
+const subAudioCommands = [
+    'individual_commands',
+    'radio/announcement',
+    'radio/ending',
+    'squad_commands',
+    'statements_responses',
+    'taunts',
+    'team_taunts'
+]
+
+function mohaafile(file, name) {
+    this.file = file
+    this.name = name
+}
+
+/**
+ * This should only be ran once during initial startup to populate the
+ * audio objects to point to valid files without re-searching
+ */
+async function populateAudio() {
+    for (const type of subAudioCommands) {
+        var afiles = await fs.readdir(path.join(americanDir, type));
+        var gfiles = await fs.readdir(path.join(germanDir, type));
+        afiles.forEach((file, index, arr) => { arr[index] = path.join(americanDir, type, file) });
+        gfiles.forEach((file, index, arr) => { arr[index] = path.join(germanDir, type, file) });
+        americanAudio[type] = afiles;
+        germanAudio[type] = gfiles;
+    }
+}
 
 function registerMohaa(client) {
+    populateAudio() // If we are using the commands then populate the audio object
     client.on('interactionCreate', interaction => {
         if (!interaction.isCommand()) return;
         const { commandName } = interaction;
@@ -39,32 +73,29 @@ function registerMohaa(client) {
     })
 }
 
-async function americanFiles() {
-    const files = await fs.readdir(american)
-    files.forEach((file, index, arr) => { arr[index] = path.join(american, file) });
-    return files
-}
-
-async function germanFiles() {
-    const files = await fs.readdir(german)
-    files.forEach((file, index, arr) => { arr[index] = path.join(german, file) });
-    return files
-}
-
 function randomFile(files) {
     return files[Math.floor(Math.random() * files.length)]
 }
 
+var randomProperty = function (obj) {
+    var keys = Object.keys(obj);
+    return obj[keys[ keys.length * Math.random() << 0]];
+};
+
+function selectRandomFile(subcommand) {
+    return randomFile(germanAudio[subcommand])
+}
+
 async function playRandomGermanMohaa(channel) {
-    const files  = await germanFiles()
-    const file = randomFile(files)
+    const subcmd = subAudioCommands[Math.floor(Math.random() * subAudioCommands.length)]
+    const file = randomFile(germanAudio[subcmd])
     connect(channel, file)
     return path.basename(file);
 }
 
 async function playRandomAmericanMohaa(channel) {
-    const files = await americanFiles()
-    const file = randomFile(files)
+    const subcmd = subAudioCommands[Math.floor(Math.random() * subAudioCommands.length)]
+    const file = randomFile(americanAudio[subcmd])
     connect(channel, file)
     return path.basename(file);
 }
@@ -72,6 +103,7 @@ async function playRandomAmericanMohaa(channel) {
 async function playRandomMohaa(channel) {
     return americanFiles().then( afiles => {
         return germanFiles().then( gfiles => {
+            if (files.length === 0) return '';
             const files = afiles.concat(gfiles);
             const file = randomFile(files)
             connect(channel, file)
@@ -91,5 +123,6 @@ const commands = [
 
 export {
     commands,
+    populateAudio,
     registerMohaa
 }

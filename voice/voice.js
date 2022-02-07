@@ -2,6 +2,7 @@ import {
     joinVoiceChannel, 
     createAudioPlayer, 
     createAudioResource,
+    VoiceConnectionStatus,
     getVoiceConnection
 } from '@discordjs/voice';
 import { SlashCommandBuilder } from '@discordjs/builders'
@@ -16,7 +17,30 @@ play.getFreeClientID().then((clientID) => {
     })
 })
 
-const dispatcher = {}
+/**
+ * Dictionary of AudioPlayers that have been created
+ * @type {AudioPlayer}
+ */
+var dispatcher = {}
+
+/**
+ * Player idle timer
+ * @global
+ */
+let timer = {}
+
+// This is a debug monitor interval
+// setInterval(() => {
+//     const d = new Date()
+//     console.log(`[${d.getMilliseconds()}] Audio Players: ${Object.keys(dispatcher)}`)
+// }, 2000)
+
+const timeoutDisconnect = (player, conn) => {
+    timer = setTimeout(() => {
+        player.stop()
+        conn.destroy()
+      }, 6 * 1000); // 60 seconds
+  }
 
 function registerVoiceCommands(client) {
     client.on('interactionCreate', async interaction => {
@@ -44,8 +68,25 @@ function registerVoiceCommands(client) {
 
 function connect(channel, stream, options) {
     return new Promise((resolve, reject) => {
+        const voiceConnId = channel.guild.id
         try {
-            const player = createAudioPlayer();
+            let player = getPlayer(channel)
+            if (!player) {
+                console.log(`Creating new AudioPlayer for ${voiceConnId}`)
+                player = createAudioPlayer( {
+                    noSubscriber: 'idle'
+                });
+            }
+            let connection = getVoiceConnection(voiceConnId)
+            if (!connection) {
+                console.log(`Creating new VoiceConnection for ${voiceConnId}`)
+                connection = joinVoiceChannel({
+                    channelId: channel.id,
+                    guildId: voiceConnId,
+                    adapterCreator: channel.guild.voiceAdapterCreator,
+                });
+            }
+
             const resource = createAudioResource(stream, { 
                     inputType: options
                 });
@@ -55,55 +96,64 @@ function connect(channel, stream, options) {
                 console.error('Player broke :(', error)
             })
 
-            const connection = joinVoiceChannel({
-                channelId: channel.id,
-                guildId: channel.guild.id,
-                adapterCreator: channel.guild.voiceAdapterCreator,
-            });
             connection.subscribe(player)
-            dispatcher[connection.joinConfig.guildId] = player;
-            // addPlayerListeners(player, connection)
+            dispatcher[voiceConnId] = player;
+            addVoiceConnListeners(connection)
+            addPlayerListeners(player, connection)
             resolve()
         } catch (error) {
+            console.log('voice/connect errored out!!!!')
             reject(error)
         }
     })
 }
 
 function getPlayer(chan) {
-    return new Promise((res, rej) =>{
-        const id = chan.guild.id
-        const player = dispatcher[id]
-        if (player) res(player);
-        else rej(new Error(`Player ${id} not found`));
-    })
-
+    const id = chan.guild.id
+    const player = dispatcher[id]
+    if(!player) console.log(`AudioPlayer ${id}  not found`, player)
+    return player
 }
 
 function pause(chan) {
-    getPlayer(chan)
-        .then( pl => { pl.pause(); })
-        .catch( err => { console.error(err)})
+    const pl = getPlayer(chan)
+    if (pl) pl.pause()
 }
 
 function resume(chan) {
-    getPlayer(chan)
-        .then( pl => { pl.unpause(); })
-        .catch( err => { console.error(err)})
+    const pl = getPlayer(chan)
+    if (pl) pl.unpause()
 }
 
 function stop(chan) {
-    const connection = getVoiceConnection(chan.guild.id)
-    if (!connection) return
-    connection.destroy();
+    const pl = getPlayer(chan)
+    if (pl)  pl.stop()
+    // Do we want it to disconnect here?
+    // const connection = getVoiceConnection(chan.guild.id)
+    // if (connection) connection.destroy();
+}
+
+function addVoiceConnListeners(connection) {
+    connection.on(VoiceConnectionStatus.Disconnected, async (oldState, newState) => {
+        try {
+            await Promise.race([
+                entersState(connection, VoiceConnectionStatus.Signalling, 5_000),
+                entersState(connection, VoiceConnectionStatus.Connecting, 5_000),
+            ]);
+            // Seems to be reconnecting to a new channel - ignore disconnect
+        } catch (error) {
+            // Seems to be a real disconnect which SHOULDN'T be recovered from
+            connection.destroy();
+        }
+    });
 }
 
 function addPlayerListeners(player, connection) {
     player.on('stateChange', (oldState, newState) => {
         console.log(`AudioPlayer transitioned from ${oldState.status} to ${newState.status}`);
         if (newState.status === 'idle') {
-            player.stop()
-            connection.destroy()
+            clearTimeout(timer)
+            timeoutDisconnect(player, connection)
         }
     });
 }
