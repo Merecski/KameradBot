@@ -39,7 +39,7 @@ const timeoutDisconnect = (player, conn) => {
     timer = setTimeout(() => {
         player.stop()
         conn.destroy()
-      }, 6 * 1000); // 60 seconds
+      }, 60 * 1000); // 60 seconds
   }
 
 function registerVoiceCommands(client) {
@@ -70,13 +70,6 @@ function connect(channel, stream, options) {
     return new Promise((resolve, reject) => {
         const voiceConnId = channel.guild.id
         try {
-            let player = getPlayer(channel)
-            if (!player) {
-                console.log(`Creating new AudioPlayer for ${voiceConnId}`)
-                player = createAudioPlayer( {
-                    noSubscriber: 'idle'
-                });
-            }
             let connection = getVoiceConnection(voiceConnId)
             if (!connection) {
                 console.log(`Creating new VoiceConnection for ${voiceConnId}`)
@@ -85,21 +78,26 @@ function connect(channel, stream, options) {
                     guildId: voiceConnId,
                     adapterCreator: channel.guild.voiceAdapterCreator,
                 });
+                addVoiceConnListeners(connection)
+            }
+
+            let player = getPlayer(channel)
+            if (!player) {
+                console.log(`Creating new AudioPlayer for ${voiceConnId}`)
+                player = createAudioPlayer( {
+                    noSubscriber: 'Pause'
+                });
+                addPlayerListeners(player, connection)
             }
 
             const resource = createAudioResource(stream, { 
                     inputType: options
                 });
             player.play(resource);
-            player.on("error", (error) => {
-                connection.destroy()
-                console.error('Player broke :(', error)
-            })
+
 
             connection.subscribe(player)
             dispatcher[voiceConnId] = player;
-            addVoiceConnListeners(connection)
-            addPlayerListeners(player, connection)
             resolve()
         } catch (error) {
             console.log('voice/connect errored out!!!!')
@@ -149,11 +147,19 @@ function addVoiceConnListeners(connection) {
 }
 
 function addPlayerListeners(player, connection) {
+    player.on("error", (error) => {
+        connection.destroy()
+        console.error('Player broke :(', error)
+    })
+
     player.on('stateChange', (oldState, newState) => {
         console.log(`AudioPlayer transitioned from ${oldState.status} to ${newState.status}`);
         if (newState.status === 'idle') {
             clearTimeout(timer)
             timeoutDisconnect(player, connection)
+        } else if (oldState.status === 'idle') {
+            console.log('Canceling Timeout')
+            clearTimeout(timer)
         }
     });
 }

@@ -68,33 +68,6 @@ class YoutubePlayer {
         return channel.guild.id
     }
 
-    joinChannel(channel) {
-        const connection = joinVoiceChannel({
-            channelId: channel.id,
-            guildId: channel.guild.id,
-            adapterCreator: channel.guild.voiceAdapterCreator,
-        });
-
-        connection.on('stateChange', (oldState, newState) => {
-            console.log(`Connection transitioned from ${oldState.status} to ${newState.status}`);
-        });
-
-        connection.on(VoiceConnectionStatus.Disconnected, async (oldState, newState) => {
-            try {
-                await Promise.race([
-                    entersState(connection, VoiceConnectionStatus.Signalling, 5_000),
-                    entersState(connection, VoiceConnectionStatus.Connecting, 5_000),
-                ]);
-                // Seems to be reconnecting to a new channel - ignore disconnect
-            } catch (error) {
-                // Seems to be a real disconnect which SHOULDN'T be recovered from
-                connection.destroy();
-            }
-        });
-
-        this.connectionIDs[connection.joinConfig.guildId] = connection.joinConfig;
-    }
-
     createPlayer(chan, url) {
         return new Promise((resolve, reject) =>{
             play.stream(url).then(stream => {
