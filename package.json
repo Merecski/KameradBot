@@ -12,7 +12,7 @@
   "scripts": {
     "register": "node deploy-commands.js",
     "start": "node index.js",
-    "dev": "nodemon --exec 'npm start'"
+    "dev": "nodemon --exec 'npm start' -i **.WAV -i **.wav"
   },
   "repository": {
     "type": "git",

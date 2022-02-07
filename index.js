@@ -8,7 +8,7 @@ import { YoutubePlayer } from "./commands/youtube.js";
 import { registerMohaa } from "./commands/mohaa.js";
 import { registerIntros } from "./commands/playintro.js";
 import { registerVoiceCommands } from "./voice/voice.js";
-import registerSecret from "./commands/secret.js";
+
 
 
 if (!config.debug || config.reloadRequired) import('./deploy-commands.js')
@@ -23,13 +23,23 @@ const client = new Client({
     partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
 });
 
+try {
+    const registerSecret = await import("./commands/secret.js");
+    registerSecret(client);
+} catch(error) {
+    if (error.code === "ERR_MODULE_NOT_FOUND") {
+        console.log('Ignoring missing optional module')
+    } else {
+        throw error
+    }
+}
+
 // Loads all client responses
 const based = new BasedCounter(client);
 const yt = new YoutubePlayer(client);
 registerMohaa(client);
 registerIntros(client);
 registerVoiceCommands(client);
-registerSecret(client);
 
 function logHeader(msg) {
     return `[${msg.guild.name}][${msg.channel.name}]`
