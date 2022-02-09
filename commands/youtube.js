@@ -1,11 +1,11 @@
-import { 
-    joinVoiceChannel, 
-    createAudioPlayer, 
-    createAudioResource, 
+import {
+    joinVoiceChannel,
+    createAudioPlayer,
+    createAudioResource,
     getVoiceConnection,
     VoiceConnectionStatus,
     NoSubscriberBehavior,
-    entersState 
+    entersState
 } from '@discordjs/voice';
 import { SlashCommandBuilder } from '@discordjs/builders'
 import { connect } from '../voice/voice.js'
@@ -52,15 +52,16 @@ class YoutubePlayer {
                 } else if (interaction.options.getSubcommand() === 'search') {
                     interaction.reply('playing...')
                     console.log(`Connecting to ${member.voice.channel.name} with ${member.user.tag} !`);
-                    const searchWords = await this.search(interaction.options.getString('search'))
-                    if (searchWords) {
-                        this.createPlayer(voiceChannel, searchWords);
+                    const searchWords = interaction.options.getString('search')
+                    const url = await this.search(searchWords)
+                    if (url) {
+                        this.createPlayer(voiceChannel, url);
                     } else {
-                        console.log('failed')
+                        interaction.reply(`No results found for ${searchWords}`)
                     }
                 }
 
-            } 
+            }
        })
    }
 

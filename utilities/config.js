@@ -11,7 +11,7 @@ const config = {
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
         pass: process.env.DB_PASS,
-        database: process.env.DB_DATABASE,
+        database: isDebug ? process.env.DB_DATABASE_DEV : process.env.DB_DATABASE,
         socket: process.env.DB_SOCKET_PATH
     },
     ignoreModules: [ 'command', 'testcmds' ]

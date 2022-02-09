@@ -39,6 +39,7 @@
     "node-pre-gyp": "^0.17.0",
     "play-dl": "^1.8.6",
     "sodium": "^3.0.2",
+    "table": "^6.8.0",
     "yt-search": "^2.10.3"
   },
   "devDependencies": {

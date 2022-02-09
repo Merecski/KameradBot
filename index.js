@@ -24,7 +24,7 @@ const client = new Client({
 });
 
 try {
-    const registerSecret = await import("./commands/secret.js");
+    const { registerSecret } = await import("./commands/secret.js");
     registerSecret(client);
 } catch(error) {
     if (error.code === "ERR_MODULE_NOT_FOUND") {
@@ -82,8 +82,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (config.debug && reaction.message.channel.name !== 'bot-testing') return
     console.debug(`${logHeader(reaction.message)} ${user.username} reacted to ${reaction.message.author.username} with ${reaction.emoji.name}`)
 });
-
-
 
 try {
     client.login(token);

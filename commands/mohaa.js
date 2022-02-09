@@ -3,7 +3,6 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 
 import fs from 'fs/promises';
 import path from 'path';
-import glob from 'glob';
 
 const germanDir = './sound/mohaa/g';
 const americanDir = './sound/mohaa/a';
