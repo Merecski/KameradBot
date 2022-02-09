@@ -1,0 +1,248 @@
+GRden_c_01a.WAV;Gib mir Deckung!
+GRden_c_01b.WAV;Gib mir Deckung!
+GRden_c_01c.WAV;Gib mir Deckung!
+GRden_c_01d.WAV;Gib mir Deckung!
+GRden_c_01i.WAV;Gib mir Deckung!
+GRden_c_02a.WAV;Ich gebe dir Deckung!
+GRden_c_02b.WAV;Ich gebe dir Deckung!
+GRden_c_02c.WAV;Ich gebe dir Deckung!
+GRden_c_02d.WAV;Ich gebe dir Deckung!
+GRden_c_02i.WAV;Ich gebe dir Deckung!
+GRden_c_03a.WAV;Folge mir!
+GRden_c_03b.WAV;Folge mir!
+GRden_c_03c.WAV;Folge mir!
+GRden_c_03d.WAV;Folge mir!
+GRden_c_03i.WAV;Folge mir!
+GRden_c_04a.WAV;Du übernimmst die Spitze.
+GRden_c_04b.WAV;Du übernimmst die Spitze.
+GRden_c_04c.WAV;Du übernimmst die Spitze.
+GRden_c_04d.WAV;Du übernimmst die Spitze.
+GRden_c_04i.WAV;Du übernimmst die Spitze.
+GRden_c_05a.WAV;Du übernimmst die Führung.
+GRden_c_05b.WAV;Du übernimmst die Führung.
+GRden_c_05c.WAV;Du übernimmst die Führung.
+GRden_c_05d.WAV;Du übernimmst die Führung.
+GRden_c_05i.WAV;Du übernimmst die Führung.
+GRden_c_06a.WAV;Unter Beschuss! Wir brauchen Hilfe!
+GRden_c_06b.WAV;Unter Beschuss! Wir brauchen Hilfe!
+GRden_c_06c.WAV;Unter Beschuss! Wir brauchen Hilfe!
+GRden_c_06d.WAV;Unter Beschuss! Wir brauchen Hilfe!
+GRden_c_06i.WAV;Unter Beschuss! Wir brauchen Hilfe!
+GRden_c_08a.WAV;Vorwärts!
+GRden_c_08b.WAV;Vorwärts!
+GRden_c_08c.WAV;Vorwärts!
+GRden_c_08d.WAV;Vorwärts!
+GRden_c_08i.WAV;Vorwärts!
+GRden_c_09a.WAV;Angriff!
+GRden_c_09b.WAV;Angriff!
+GRden_c_09c.WAV;Angriff!
+GRden_c_09d.WAV;Angriff!
+GRden_c_09i.WAV;Angriff!
+GRden_c_10a.WAV;Feuer!
+GRden_c_10b.WAV;Feuer!
+GRden_c_10c.WAV;Feuer!
+GRden_c_10d.WAV;Feuer!
+GRden_c_10i.WAV;Feuer!
+GRden_g_01a.WAV;Allemann vorwärts!
+GRden_g_01b.WAV;Allemann vorwärts!
+GRden_g_01c.WAV;Allemann vorwärts!
+GRden_g_01d.WAV;Allemann vorwärts!
+GRden_g_01i.WAV;Allemann vorwärts!
+GRden_g_02a.WAV;Allemann zurück!
+GRden_g_02b.WAV;Allemann zurück!
+GRden_g_02c.WAV;Allemann zurück!
+GRden_g_02d.WAV;Allemann zurück!
+GRden_g_02i.WAV;Allemann zurück!
+GRden_g_03a.WAV;Rechte Flanke angreifen!
+GRden_g_03b.WAV;Rechte Flanke angreifen!
+GRden_g_03c.WAV;Rechte Flanke angreifen!
+GRden_g_03d.WAV;Rechte Flanke angreifen!
+GRden_g_03i.WAV;Rechte Flanke angreifen!
+GRden_g_04a.WAV;Linke Flanke angreifen!
+GRden_g_04b.WAV;Linke Flanke angreifen!
+GRden_g_04c.WAV;Linke Flanke angreifen!
+GRden_g_04d.WAV;Linke Flanke angreifen!
+GRden_g_04i.WAV;Linke Flanke angreifen!
+GRden_g_05a.WAV;Stellung halten!
+GRden_g_05b.WAV;Stellung halten!
+GRden_g_05c.WAV;Stellung halten!
+GRden_g_05d.WAV;Stellung halten!
+GRden_g_05i.WAV;Stellung halten!
+GRden_g_06a.WAV;Feuerdeckung!
+GRden_g_06b.WAV;Feuerdeckung!
+GRden_g_06c.WAV;Feuerdeckung!
+GRden_g_06d.WAV;Feuerdeckung!
+GRden_g_06i.WAV;Feuerdeckung!
+GRden_g_07a.WAV;Allemann sammeln!
+GRden_g_07b.WAV;Allemann sammeln!
+GRden_g_07c.WAV;Allemann sammeln!
+GRden_g_07d.WAV;Allemann sammeln!
+GRden_g_07i.WAV;Allemann sammeln!
+GRden_m_11a.WAV;Durch ihn kommen wir um!
+GRden_m_11b.WAV;Durch ihn kommen wir um!
+GRden_m_11c.WAV;Durch ihn kommen wir um!
+GRden_m_11d.WAV;Durch ihn kommen wir um!
+GRden_m_11i.WAV;Durch ihn kommen wir um!
+GRden_m_12a.WAV;Ne menge guter Kameraden werden wegen seiner schlechten Führung umkommen!
+GRden_m_12b.WAV;Ne menge guter Kameraden werden wegen seiner schlechten Führung umkommen!
+GRden_m_12c.WAV;Ne menge guter Kameraden werden wegen seiner schlechten Führung umkommen!
+GRden_m_12d.WAV;Ne menge guter Kameraden werden wegen seiner schlechten Führung umkommen!
+GRden_m_12i.WAV;Ne menge guter Kameraden werden wegen seiner schlechten Führung umkommen!
+GRden_m_13a.WAV;Na gut dass der weg ist!
+GRden_m_13b.WAV;Na gut dass der weg ist!
+GRden_m_13c.WAV;Na gut dass der weg ist!
+GRden_m_13d.WAV;Na gut dass der weg ist!
+GRden_m_13i.WAV;Na gut dass der weg ist!
+GRden_m_14a.WAV;Durch den werden wir alle verrecken!
+GRden_m_14b.WAV;Durch den werden wir alle verrecken!
+GRden_m_14c.WAV;Durch den werden wir alle verrecken!
+GRden_m_14d.WAV;Durch den werden wir alle verrecken!
+GRden_m_14i.WAV;Durch den werden wir alle verrecken!
+GRden_m_15a.WAV;Kamerad, runter mit dir!
+GRden_m_15b.WAV;Kamerad, runter mit dir!
+GRden_m_15c.WAV;Kamerad, runter mit dir!
+GRden_m_15d.WAV;Kamerad, runter mit dir!
+GRden_m_15i.WAV;Kamerad, runter mit dir!
+GRden_m_16a.WAV;Bleib von meinem Loch fern Junge!
+GRden_m_16b.WAV;Bleib von meinem Loch fern Junge!
+GRden_m_16c.WAV;Bleib von meinem Loch fern Junge!
+GRden_m_16d.WAV;Bleib von meinem Loch fern Junge!
+GRden_m_16i.WAV;Bleib von meinem Loch fern Junge!
+GRden_m_17a.WAV;Such dein eigenes Versteck!
+GRden_m_17b.WAV;Such dein eigenes Versteck!
+GRden_m_17c.WAV;Such dein eigenes Versteck!
+GRden_m_17d.WAV;Such dein eigenes Versteck!
+GRden_m_17i.WAV;Such dein eigenes Versteck!
+GRden_m_18a.WAV;Aus dem Weg!
+GRden_m_18b.WAV;Aus dem Weg!
+GRden_m_18c.WAV;Aus dem Weg!
+GRden_m_18d.WAV;Aus dem Weg!
+GRden_m_18i.WAV;Aus dem Weg!
+GRden_m_25a.WAV;Das war Drecksarbeit.
+GRden_m_25b.WAV;Das war Drecksarbeit.
+GRden_m_25c.WAV;Das war Drecksarbeit.
+GRden_m_25d.WAV;Das war Drecksarbeit.
+GRden_m_25i.WAV;Das war Drecksarbeit.
+GRden_o_04a.wav;
+GRden_o_04c.wav;
+GRden_o_05a.wav;
+GRden_o_05c.wav;
+GRden_o_05i.wav;
+GRden_o_06a.wav;
+GRden_o_06c.wav;
+GRden_o_06i.wav;
+GRden_o_08a.wav;
+GRden_o_08b.wav;
+GRden_o_08c.wav;
+GRden_o_09a.wav;
+GRden_o_09c.wav;
+GRden_o_09i.wav;
+GRden_o_10a.wav;
+GRden_o_10c.wav;
+GRden_o_11a.wav;
+GRden_o_11c.wav;
+GRden_o_11d.wav;
+GRden_o_13c.wav;
+GRden_o_13i.wav;
+GRden_r_01a.WAV;Zu Befehl!
+GRden_r_01b.WAV;Zu Befehl!
+GRden_r_01c.WAV;Zu Befehl!
+GRden_r_01d.WAV;Zu Befehl!
+GRden_r_01i.WAV;Zu Befehl!
+GRden_r_02a.WAV;Nein!
+GRden_r_02b.WAV;Nein!
+GRden_r_02c.WAV;Nein!
+GRden_r_02d.WAV;Nein!
+GRden_r_02i.WAV;Nein!
+GRden_r_03a.WAV;Feind gesichtet!
+GRden_r_03b.WAV;Feind gesichtet!
+GRden_r_03c.WAV;Feind gesichtet!
+GRden_r_03d.WAV;Feind gesichtet!
+GRden_r_03i.WAV;Feind gesichtet!
+GRden_r_04a.WAV;Heckenschuetze!
+GRden_r_04b.WAV;Heckenschuetze!
+GRden_r_04c.WAV;Heckenschuetze!
+GRden_r_04d.WAV;Heckenschuetze!
+GRden_r_04i.WAV;Heckenschuetze!
+GRden_r_05a.WAV;Granate! Deckung!
+GRden_r_05b.WAV;Granate! Deckung!
+GRden_r_05c.WAV;Granate! Deckung!
+GRden_r_05d.WAV;Granate! Deckung!
+GRden_r_05i.WAV;Granate! Deckung!
+GRden_r_06a.WAV;Gebiet gesichert.
+GRden_r_06b.WAV;Gebiet gesichert.
+GRden_r_06c.WAV;Gebiet gesichert.
+GRden_r_06d.WAV;Gebiet gesichert.
+GRden_r_06i.WAV;Gebiet gesichert.
+GRden_r_07a.WAV;Guter Schuss!
+GRden_r_07b.WAV;Guter Schuss!
+GRden_r_07c.WAV;Guter Schuss!
+GRden_r_07d.WAV;Guter Schuss!
+GRden_r_07i.WAV;Guter Schuss!
+GRden_r_08a.WAV;Danke.
+GRden_r_08b.WAV;Danke.
+GRden_r_08c.WAV;Danke.
+GRden_r_08d.WAV;Danke.
+GRden_r_08i.WAV;Danke.
+GRden_r_09a.WAV;Ich werde es Ihnen vergelten.
+GRden_r_09b.WAV;Ich werde es Ihnen vergelten.
+GRden_r_09c.WAV;Ich werde es Ihnen vergelten.
+GRden_r_09d.WAV;Ich werde es Ihnen vergelten.
+GRden_r_09i.WAV;Ich werde es Ihnen vergelten.
+GRden_r_10a.WAV;Wie, mehr kannst du nicht?
+GRden_r_10b.WAV;Wie, mehr kannst du nicht?
+GRden_r_10c.WAV;Wie, mehr kannst du nicht?
+GRden_r_10d.WAV;Wie, mehr kannst du nicht?
+GRden_r_10i.WAV;Wie, mehr kannst du nicht?
+GRden_r_11a.WAV; Den Ammis sind die echten Männer ausgegangen!
+GRden_r_11b.WAV; Den Ammis sind die echten Männer ausgegangen!
+GRden_r_11c.WAV; Den Ammis sind die echten Männer ausgegangen!
+GRden_r_11d.WAV; Den Ammis sind die echten Männer ausgegangen!
+GRden_r_11i.WAV; Den Ammis sind die echten Männer ausgegangen!
+GRden_r_12a.WAV;Rennt nur Ihr feigen Säue!
+GRden_r_12b.WAV;Rennt nur Ihr feigen Säue!
+GRden_r_12c.WAV;Rennt nur Ihr feigen Säue!
+GRden_r_12d.WAV;Rennt nur Ihr feigen Säue!
+GRden_r_12i.WAV;Rennt nur Ihr feigen Säue!
+GRden_r_13a.WAV;Die sind ein Haufen Feiglinge!
+GRden_r_13b.WAV;Die sind ein Haufen Feiglinge!
+GRden_r_13c.WAV;Die sind ein Haufen Feiglinge!
+GRden_r_13d.WAV;Die sind ein Haufen Feiglinge!
+GRden_r_13i.WAV;Die sind ein Haufen Feiglinge!
+GRden_r_15a.WAV;Mach erstmal Schiessübungen!
+GRden_r_15b.WAV;Mach erstmal Schiessübungen!
+GRden_r_15c.WAV;Mach erstmal Schiessübungen!
+GRden_r_15d.WAV;Mach erstmal Schiessübungen!
+GRden_r_15i.WAV;Mach erstmal Schiessübungen!
+GRden_r_16a.WAV;Bereite dich das nächste mal besser vor!
+GRden_r_16b.WAV;Bereite dich das nächste mal besser vor!
+GRden_r_16c.WAV;Bereite dich das nächste mal besser vor!
+GRden_r_16d.WAV;Bereite dich das nächste mal besser vor!
+GRden_r_16i.WAV;Bereite dich das nächste mal besser vor!
+GRden_r_19a.WAV;Probiere es nochmal!
+GRden_r_19b.WAV;Probiere es nochmal!
+GRden_r_19c.WAV;Probiere es nochmal!
+GRden_r_19d.WAV;Probiere es nochmal!
+GRden_r_19i.WAV;Probiere es nochmal!
+GRden_r_20a.WAV;Französische Schülerinnen schießen besser!
+GRden_r_20b.WAV;Französische Schülerinnen schießen besser!
+GRden_r_20c.WAV;Französische Schülerinnen schießen besser!
+GRden_r_20d.WAV;Französische Schülerinnen schießen besser!
+GRden_r_20i.WAV;Französische Schülerinnen schießen besser!
+GRden_v_01a.wav;
+GRden_v_01c.wav;
+GRden_v_01i.wav;
+GRden_v_02a.wav;
+GRden_v_02b.wav;
+GRden_v_02c.wav;
+GRden_v_02d.wav;
+GRden_v_03a.wav;
+GRden_v_03b.wav;
+GRden_v_03i.wav;
+GRden_v_04a.wav;
+GRden_v_04b.wav;
+GRden_v_04c.wav;
+GRden_v_04d.wav;
+GRden_v_04i.wav;
+GRden_v_06a.wav;
+GRden_v_06b.wav;
