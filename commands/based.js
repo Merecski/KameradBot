@@ -1,4 +1,3 @@
-import { MessageEmbed } from 'discord.js'
 import { SlashCommandBuilder, codeBlock } from '@discordjs/builders'
 import { checkPartial } from '#utils/utils'
 import { config } from '#utils/config'

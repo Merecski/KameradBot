@@ -1,4 +1,4 @@
-import { connect } from '../voice/voice.js'
+import { connect } from './voice.js'
 import { SlashCommandBuilder } from '@discordjs/builders';
 
 import fs from 'fs/promises';

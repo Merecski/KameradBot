@@ -8,7 +8,7 @@ import {
     entersState
 } from '@discordjs/voice';
 import { SlashCommandBuilder } from '@discordjs/builders'
-import { connect } from '../voice/voice.js'
+import { connect } from './voice.js'
 import play from 'play-dl'
 
 class YoutubePlayer {

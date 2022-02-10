@@ -7,7 +7,7 @@ import { BasedCounter } from './commands/based.js'
 import { YoutubePlayer } from "./commands/youtube.js";
 import { registerMohaa } from "./commands/mohaa.js";
 import { registerIntros } from "./commands/playintro.js";
-import { registerVoiceCommands } from "./voice/voice.js";
+import { registerVoiceCommands } from "./commands/voice.js";
 
 
 
