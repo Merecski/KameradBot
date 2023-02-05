@@ -11,15 +11,18 @@ CREATE TABLE IF NOT EXISTS users (
     userid int NOT NULL UNIQUE,
     username varchar(255) NOT NULL,
     bot boolean,
+    based int NOT NULL DEFAULT 0,
+    intro_enable boolean,
+    intro_file varchar(255),
     PRIMARY KEY (userid)
 );
 
-CREATE TABLE IF NOT EXISTS based (
-    userid int NOT NULL UNIQUE,
-    count int NOT NULL DEFAULT 0,
-    PRIMARY KEY (userid)
-);
+-- CREATE TABLE IF NOT EXISTS based (
+--     userid int NOT NULL UNIQUE,
+--     count int NOT NULL DEFAULT 0,
+--     PRIMARY KEY (userid)
+-- );
 
 -- Injecting fake data to mess around with
-INSERT IGNORE INTO users VALUES (474747, 'fakedata', FALSE);
-INSERT IGNORE INTO based VALUES (474747, 99);
+-- INSERT IGNORE INTO users VALUES (474747, 'fakedata', FALSE);
+-- INSERT IGNORE INTO based VALUES (474747, 99);

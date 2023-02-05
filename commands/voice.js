@@ -6,16 +6,7 @@ import {
     getVoiceConnection
 } from '@discordjs/voice';
 import { SlashCommandBuilder } from '@discordjs/builders'
-import play from 'play-dl'
 
-// This is necessary to stream anything from SoundCloud
-play.getFreeClientID().then((clientID) => {
-    play.setToken({
-      soundcloud : {
-          client_id : clientID
-      }
-    })
-})
 
 /**
  * Dictionary of AudioPlayers that have been created
@@ -72,7 +63,7 @@ function connect(channel, stream, options) {
         try {
             let connection = getVoiceConnection(voiceConnId)
             if (!connection) {
-                console.log(`Creating new VoiceConnection for ${voiceConnId}`)
+                console.log(`Creating new VoiceConnection for Guild[${voiceConnId}]`)
                 connection = joinVoiceChannel({
                     channelId: channel.id,
                     guildId: voiceConnId,
@@ -83,7 +74,7 @@ function connect(channel, stream, options) {
 
             let player = getPlayer(channel)
             if (!player) {
-                console.log(`Creating new AudioPlayer for ${voiceConnId}`)
+                console.log(`Creating new AudioPlayer for Guild[${voiceConnId}]`)
                 player = createAudioPlayer( {
                     noSubscriber: 'Pause'
                 });
@@ -109,7 +100,7 @@ function connect(channel, stream, options) {
 function getPlayer(chan) {
     const id = chan.guild.id
     const player = dispatcher[id]
-    if(!player) console.log(`AudioPlayer ${id}  not found`, player)
+    if(!player) console.log(`AudioPlayer Guild[${id}] not found`)
     return player
 }
 

@@ -1,6 +1,6 @@
 import { config, token } from '#utils/config'
 import { checkPartial } from '#utils/utils'
-import { Client, Intents, InteractionCollector } from 'discord.js'
+import { Client, GuildScheduledEvent, Intents, InteractionCollector } from 'discord.js'
 import registerCommands from './deploy-commands.js'
 
 import { BasedCounter } from './commands/based.js'
@@ -73,7 +73,7 @@ client.on('ready', () => {
 // All of these client events are just for logging
 client.on('messageCreate', async msg => {
     if (msg.author.bot || await checkPartial(msg)) return
-    if (config.debug && msg.channel.name !== 'bot-testing') return
+    if (config.debug && msg.channel.name !== 'bot-test') return
     console.debug(`${logHeader(msg)} ${msg.author.username}: ${msg.content}`)
 });
 

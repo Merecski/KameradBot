@@ -155,7 +155,9 @@ class BasedCounter {
         if (msg.type === 'REPLY' && msg.content.toLowerCase() === "based") {
             const repliedTo = await msg.channel.messages.fetch(msg.reference.messageId)
             this.add(repliedTo);
-            repliedTo.react(this.client.emojis.cache.find(emoji => emoji.name === 'based'))
+            // const guild = this.client.guilds.cache.get(msg.guildId); // Getting the guild.
+            // const member = guild.emojis.cache.find(emoji => emoji.name === 'based'); // Getting the member.
+            repliedTo.react(this.client.emojis.cache.find(emoji => emoji.name === 'based')) // This ain't right
             console.log(`${msg.author.username} gave ${repliedTo.author.username} +1 based`)
         }
     }

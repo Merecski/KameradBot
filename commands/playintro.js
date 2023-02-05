@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
-import { connect } from '../voice/voice.js'
+import { connect } from './voice.js'
 import { pool } from '../database/database.js'
 
 /**
@@ -34,12 +34,31 @@ function registerIntros(client) {
         if (!interaction.isCommand()) return;
         const { commandName } = interaction;
         if (commandName === 'intro') {
-            const enable = interaction.options.getString('enable')
-            pool.query(`UPDATE users SET intro_enable = ${enable} WHERE userid = '${id}'`, (err) => {
-                if (err) console.log(err)
-            })
-            interaction.reply({content: `Set intro is ${enable}`, ephemeral: true})
-        }
+            const subcmd = interaction.options.getSubcommand();
+            if (subcmd === 'enable') {
+                pool.query(`UPDATE users SET intro_enable = 1 WHERE userid = '${id}'`, (err) => {
+                    if (err) console.log(err)
+                })
+                interaction.reply({content: `Set intro to enabled`, ephemeral: true})
+            } else if (subcmd === 'disable') {
+                pool.query(`UPDATE users SET intro_enable = 0 WHERE userid = '${id}'`, (err) => {
+                    if (err) console.log(err)
+                })
+                interaction.reply({content: `Set intro to disabled`, ephemeral: true})
+            } else if (subcmd === 'add') {
+                subcmd.options.getString('filename')
+                pool.query(`UPDATE users SET intro_file = ${filename} WHERE userid = '${id}'`, (err) => {
+                    if (err) console.log(err)
+                })
+                interaction.reply({content: `Set intro to disabled`, ephemeral: true})
+            } else if (subcmd === 'remove') {
+                subcmd.options.getString('filename')
+                pool.query(`UPDATE users SET intro_file = ${filename} WHERE userid = '${id}'`, (err) => {
+                    if (err) console.log(err)
+                })
+                interaction.reply({content: `Set intro to disabled`, ephemeral: true})
+            }
+        } 
     })
 }
 
@@ -61,7 +80,13 @@ function checkRunIntros(joinId, channel) {
 
 const commands = [
     new SlashCommandBuilder().setName('intro').setDescription('Enable or disable personal intro')
-        .addBooleanOption(option => option.setName('enable').setDescription('true/false').setRequired(true))
+        .addSubcommand(subcommand => subcommand.setName('enable').setDescription('Enable intro for user'))
+        .addSubcommand(subcommand => subcommand.setName('disable').setDescription('Disable intro for user'))
+        .addSubcommand(subcommand => subcommand.setName('add').setDescription('Add intro for user')
+            .addStringOption(option => option.setName('filename').setDescription('filename of .mp3')))
+        .addSubcommand(subcommand => subcommand.setName('remove').setDescription('Remove intro for user')
+            .addUserOption(option => option.setName('user').setDescription('Remove user\'s intro')))
+
 ]
 
 export {

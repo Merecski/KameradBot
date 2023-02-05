@@ -47,6 +47,33 @@ function createConnection() {
     return conn
 }
 
+class Database {
+    constructor() {
+        this.pool = createPool() 
+    }
+    
+    createPool() {
+        const pool = mysql.createPool({
+            connectionLimit : 100, //important
+            host:     config.db.host,
+            // port:     '/var/run/mysqld/mysqld.sock',
+            port:     3306,
+            user:     config.db.user,
+            password: config.db.pass,
+            database: config.db.database,
+            connectTimeout: 1000,
+        });
+    
+        pool.on('connection', () => {
+            console.log(`MySQL pool connected to database: ${config.db.database}`)
+        })
+    
+        return pool
+    }
+
+    
+}
+
 function createPool() {
     const pool = mysql.createPool({
         connectionLimit : 100, //important

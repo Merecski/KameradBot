@@ -11,6 +11,16 @@ import { SlashCommandBuilder } from '@discordjs/builders'
 import { connect } from './voice.js'
 import play from 'play-dl'
 
+
+// This is necessary to stream anything from SoundCloud
+play.getFreeClientID().then((clientID) => {
+    play.setToken({
+      soundcloud : {
+          client_id : clientID
+      }
+    })
+})
+
 class YoutubePlayer {
     constructor(client) {
         // this.conn = new VoiceConnection()
