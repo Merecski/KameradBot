@@ -10,7 +10,7 @@ import { registerIntros } from "./commands/playintro.js";
 import { registerVoiceCommands } from "./commands/voice.js";
 
 
-
+console.log("Running in", (config.debug ? "DEBUG" : "PRODUCTION"), "mode")
 if (!config.debug || config.reloadRequired) import('./deploy-commands.js')
 
 const client = new Client({
