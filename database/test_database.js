@@ -1,10 +1,16 @@
 import fetch from "node-fetch";
 
-function getUsersTest() {
-    fetch('http://127.0.0.1:8080/users')
+async function getUserTest(id) {
+    var address = "http://127.0.0.1:8080/users"
+    address = address + (id ? "/" + id : "")
+    var data = await fetch(address)
     .then(res => res.json())
-    .then(out => console.log('getUsersTest response: ', out))
+    .then(out => {
+        console.log('getUsersTest response: ', out)
+        return out
+    })
     .catch(err => { throw err });
+    return data
 }
 
 async function addUserTest() {
@@ -21,7 +27,7 @@ async function addUserTest() {
             'Accept':'application/json'
         }
     })
-    .then(res => res.text())
+    .then(res => res.json())
     .then(out => console.log('addUserTest response: ', out))
     .catch(err => { throw err });
 }
@@ -67,6 +73,42 @@ async function deleteUserTest() {
     .catch(err => { throw err });
 }
 
-await addUserTest()
-await modifyUserTest()
-await deleteUserTest()
+
+async function updateUserBased(id, based) {
+    var newData = {
+        userid: id,
+        based: based
+    }
+
+    getUserTest(newData.userid)
+    .then((data) => {
+        for (const [key, value] of Object.entries(newData)) {
+            data[key] = value
+        }
+        console.log("updateUserBased data being sent: ", data)
+        fetch('http://127.0.0.1:8080/users', {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+                'Accept':'application/json'
+            }
+        })
+        .then(res => res.text())
+        .then(out => {
+            console.log('User update response: ', out)
+        })
+        .catch(err => { throw err });
+    })
+}
+
+await getUserTest('159782355723223042')
+// updateUserBased('474747', 0)
+// .then(res => {
+//     if (res) {
+//         console.log("modified:", res)
+//     }
+// })
+// await addUserTest()
+// await modifyUserTest()
+// await deleteUserTest()

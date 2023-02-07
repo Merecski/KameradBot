@@ -2,14 +2,12 @@ import { SlashCommandBuilder, codeBlock } from '@discordjs/builders'
 import { checkPartial } from '#utils/utils'
 import { config } from '#utils/config'
 import { table } from 'table'
+import { getUserBased, updateUserBased } from './based.fetch.js'
 
 
 class BasedCounter {
     constructor(client) {
-        import('../database/database.js').then(db => {
-            this.pool = db.pool;
-            this.loadData();
-        })
+        this.loadData();
         this.based = new Object();
         this.client = client;
         this.registerCommands();
@@ -39,6 +37,13 @@ class BasedCounter {
             this.handleBasedReactions(reaction)
         });
 
+        this.client.on('messageReactionRemove', async (reaction, user) => {
+            if (user.bot || await checkPartial(reaction)) return
+            if (config.debug && reaction.message.channel.name !== 'bot-testing') return
+            if (!config.debug && user.author === reaction.author) return
+            this.handleBasedRemoval(reaction)
+        });
+
         this.client.on('messageCreate', async msg => {
             if (msg.author.bot || await checkPartial(msg)) return
             if (config.debug && msg.channel.name !== 'bot-testing') return
@@ -48,12 +53,11 @@ class BasedCounter {
 
     // Load based data from database
     loadData() {
-        this.pool.query("SELECT * FROM based", (err, result, fields) => {
-            if (err) throw err
-            const tmp = JSON.parse(JSON.stringify(result))
-            console.log('Loaded based data:', tmp)
-            for (const user of tmp) {
-                this.based[user.userid] = user.count;
+        getUserBased()
+        .then(result => {
+            console.log('Loaded based data:', result)
+            for (const user of result) {
+                this.based[user.userid] = user.based;
             }
         })
     }
@@ -115,21 +119,16 @@ class BasedCounter {
     // Update database for specific user
     update(id) {
         console.log(`Updating user ${id} with count ${this.count(id)}`)
-        this.pool.query(`UPDATE users SET based = ${this.count(id)} WHERE userid = '${id}'`, (err, result, fields) => {
-            if (err) throw err
-        })
+        updateUserBased(id, this.count(id))
     }
 
     add(msg) {
-        let id = config.debug ? '474747' : msg.author.id;
+        let id = msg.author.id;
         let username = msg.author.username;
         if (typeof id !== "string") return;
         if (id in this.based) {
             this.based[id] += 1;
         } else {
-            this.pool.query(`INSERT INTO based (userid, count) VALUES ('${id}', 1)`, (err) => {
-                if (err) throw err
-            })
             this.based[id] = 1;
             msg.reply(`Congratulations ${username} your first based content!`);
         }
@@ -139,12 +138,14 @@ class BasedCounter {
         this.update(id)
     }
 
-    remove(id) {
+    remove(msg) {
+        let id = msg.author.id;
         if (id in this.based) {
             this.based[id] -= 1;
         } else {
             this.based[id] = 0;
         }
+        this.update(id)
     }
 
     count(id) {
@@ -165,6 +166,13 @@ class BasedCounter {
     handleBasedReactions(reaction) {
         if (reaction.emoji.name === 'based') {
             this.add(reaction.message);
+            console.debug("Updated counter: ", this.based)
+        }
+    }
+
+    handleBasedRemoval(reaction) {
+        if (reaction.emoji.name === 'based') {
+            this.remove(reaction.message);
             console.debug("Updated counter: ", this.based)
         }
     }

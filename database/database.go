@@ -54,6 +54,23 @@ func (h dbHandler) getUsersData(w http.ResponseWriter, req *http.Request) {
 	data, err := json.Marshal(all_users)
 	if err != nil {
 		log.Println("Failed to convert to json")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(data)
+}
+
+func (h dbHandler) getUserData(w http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	user_row := db_users{}
+	log.Printf("Searching for id: %s", vars["id"])
+	row := h.db.QueryRow("SELECT userid, username, bot, based, intro_enable, intro_file FROM users WHERE userid=?", vars["id"])
+	row.Scan(&user_row.UserId, &user_row.Username, &user_row.Bot, &user_row.Based, &user_row.IntroEnable, &user_row.IntroFile)
+
+	data, err := json.Marshal(user_row)
+	if err != nil {
+		log.Println("Failed to convert to json")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	w.Write(data)
@@ -65,12 +82,15 @@ func (h dbHandler) postUserData(w http.ResponseWriter, req *http.Request) {
 	err := decoder.Decode(&user)
 	if err != nil {
 		log.Printf("Failed decoding db_users: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	var exists bool
 	row := h.db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE userid=?)", user.UserId)
 	if err := row.Scan(&exists); err != nil {
 		log.Printf("Error scanning for user(%s): %v", user.UserId, err)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	} else if !exists {
 		h.newUserSQL(user)
@@ -108,6 +128,7 @@ func (h dbHandler) deleteUser(w http.ResponseWriter, req *http.Request) {
 	err := decoder.Decode(&user)
 	if err != nil {
 		log.Printf("Failed decoding db_users: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -165,6 +186,7 @@ func Run() {
 	r.HandleFunc("/hello", dbh.hello)
 	r.HandleFunc("/users", dbh.getUsersData).Methods("GET")
 	r.HandleFunc("/users", dbh.postUserData).Methods("POST")
+	r.HandleFunc("/users/{id:[0-9]+}", dbh.getUserData)
 	r.HandleFunc("/users/delete", dbh.deleteUser).Methods("POST")
 	http.Handle("/", r)
 	log.Printf("Listening and Serving http server on %s", port)
