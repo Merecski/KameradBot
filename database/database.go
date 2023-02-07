@@ -1,4 +1,4 @@
-package main
+package kamerad_db
 
 import (
 	"database/sql"
@@ -10,7 +10,6 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 )
 
 type db_users struct {
@@ -143,13 +142,7 @@ func (h dbHandler) hello(w http.ResponseWriter, req *http.Request) {
 	w.Write([]byte("Hi friend! :)"))
 }
 
-func main() {
-	log.SetFlags(log.Lshortfile | log.Lmsgprefix)
-	err := godotenv.Load("../.env")
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-
+func Run() {
 	user := os.Getenv("DB_USER")
 	pass := os.Getenv("DB_PASS")
 	database := os.Getenv("DB_DATABASE_DEV")
@@ -158,17 +151,14 @@ func main() {
 	if err != nil {
 		log.Fatal("Failed to connect to database")
 	}
+	log.Println("Connected to database")
 	defer db.Close()
 
 	dbh := dbHandler{
 		db: db,
 	}
 
-	user_row := db_users{}
-	row := db.QueryRow("select * from users")
-	row.Scan(&user_row.UserId, &user_row.Username, &user_row.Bot, &user_row.Based, &user_row.IntroEnable, &user_row.IntroFile)
-	log.Printf("Data from query: '%+v'", user_row)
-
+	port := ":8080"
 	r := mux.NewRouter()
 	r.HandleFunc("/", dbh.version)
 	r.HandleFunc("/version", dbh.version)
@@ -177,5 +167,6 @@ func main() {
 	r.HandleFunc("/users", dbh.postUserData).Methods("POST")
 	r.HandleFunc("/users/delete", dbh.deleteUser).Methods("POST")
 	http.Handle("/", r)
-	http.ListenAndServe(":8080", nil)
+	log.Printf("Listening and Serving http server on %s", port)
+	http.ListenAndServe(port, nil)
 }

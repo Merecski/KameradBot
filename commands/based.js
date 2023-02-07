@@ -17,7 +17,7 @@ class BasedCounter {
 
     // Register all realated interactions
     registerCommands() {
-         this.client.on('interactionCreate', async interaction => {
+        this.client.on('interactionCreate', async interaction => {
             if (!interaction.isCommand()) return;
         	const { commandName } = interaction;
             if (commandName === 'basedcount') {
@@ -32,7 +32,7 @@ class BasedCounter {
             }
         })
 
-         this.client.on('messageReactionAdd', async (reaction, user) => {
+        this.client.on('messageReactionAdd', async (reaction, user) => {
             if (user.bot || await checkPartial(reaction)) return
             if (config.debug && reaction.message.channel.name !== 'bot-testing') return
             if (!config.debug && user.author === reaction.author) return
