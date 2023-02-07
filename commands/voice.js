@@ -29,8 +29,9 @@ let timer = {}
 const timeoutDisconnect = (player, conn) => {
     timer = setTimeout(() => {
         player.stop()
-        conn.destroy()
-      }, 60 * 1000); // 60 seconds
+        // This keeps causing errors. Find a better way
+        //conn.destroy()
+      }, 30 * 60 * 1000); // 30 minutes
   }
 
 function registerVoiceCommands(client) {
