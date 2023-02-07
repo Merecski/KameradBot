@@ -11,14 +11,9 @@ var lastPlayed = {
 }
 
 var reserved = {
-    'cornpal': {
-        id: '204761315808509952',
-        file: './sound/intros/john-cena.mp3'
-    },
-    'alter': {
-        id: '159782355723223042',
-        file: './sound/intros/hank-hill-rap.mp3'
-    }
+    '204761315808509952': './sound/intros/john-cena.mp3',
+    '159782355723223042': './sound/intros/hank-hill-rap.mp3',
+    '224270656643137536': './sound/intros/brain_fart.mp3'
 }
 
 
@@ -63,17 +58,17 @@ function registerIntros(client) {
 }
 
 function checkRunIntros(joinId, channel) {
-    for (const [name, info] of Object.entries(reserved)) {
+    for (const [id, file] of Object.entries(reserved)) {
         const d = new Date();
         // Only run once a day
-        if (joinId === info.id) {
-            if (d.getDate() === lastPlayed[info.id]) {
-                console.log(`${name} already had their intro today`)
+        if (joinId === id) {
+            if (d.getDate() === lastPlayed[id]) {
+                console.log(`${id} already had their intro today`)
                 continue
             }
-            console.log(`Activating ${name} intro`)
-            lastPlayed[info.id] = d.getDate()
-            connect(channel, info.file)
+            console.log(`Activating ${id} intro`)
+            lastPlayed[id] = d.getDate()
+            connect(channel, file)
         }
     }
 }
