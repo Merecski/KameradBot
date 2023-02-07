@@ -1,18 +1,25 @@
 -- Starter kit for maybe be more of a sql database
 
-CREATE DATABASE IF NOT EXISTS kamerad_bot;
-USE kamerad_bot;
+DECLARE @PRODUCTION AS boolean=FALSE;
+
+IF @PRODUCTION THEN
+    CREATE DATABASE IF NOT EXISTS kamerad_bot;
+    USE kamerad_bot;
+ELSE
+    CREATE DATABASE IF NOT EXISTS kamerad_dev;
+    USE kamerad_dev;
+END IF;
 
 CREATE USER 'kamerad'@'localhost';
 GRANT ALL PRIVILEGES ON kamerad.* to 'kamerad'@'localhost';
 FLUSH PRIVILEGES;
 
 CREATE TABLE IF NOT EXISTS users (
-    userid int NOT NULL UNIQUE,
+    userid varchar(32) NOT NULL UNIQUE,
     username varchar(255) NOT NULL,
-    bot boolean,
+    bot boolean NOT NULL DEFAULT FALSE,
     based int NOT NULL DEFAULT 0,
-    intro_enable boolean,
+    intro_enable boolean NOT NULL,
     intro_file varchar(255),
     PRIMARY KEY (userid)
 );
