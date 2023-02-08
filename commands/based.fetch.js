@@ -19,7 +19,6 @@ function updateUserBased(id, based) {
         for (const [key, value] of Object.entries(newData)) {
             data[key] = value
         }
-        console.log("Updating user information:", data)
         fetch('http://127.0.0.1:8080/users', {
             method: 'POST',
             body: JSON.stringify(data),

@@ -55,7 +55,6 @@ class BasedCounter {
     loadData() {
         getUserBased()
         .then(result => {
-            console.log('Loaded based data:', result)
             for (const user of result) {
                 this.based[user.userid] = user.based;
             }
@@ -116,12 +115,6 @@ class BasedCounter {
         return table(finalOutput, tableConfig)
     }
 
-    // Update database for specific user
-    update(id) {
-        console.log(`Updating user ${id} with count ${this.count(id)}`)
-        updateUserBased(id, this.count(id))
-    }
-
     add(msg) {
         let id = msg.author.id;
         let username = msg.author.username;
@@ -135,7 +128,8 @@ class BasedCounter {
         if (this.based[id] && this.based[id] % 100 === 0) {
             msg.reply(`Your based counter has reached ${this.based[id]}`);
         }
-        this.update(id)
+        console.log(`Adding ${username}'s based counter: ${this.count(id)}`)
+        updateUserBased(id, this.count(id))
     }
 
     remove(msg) {
@@ -145,7 +139,8 @@ class BasedCounter {
         } else {
             this.based[id] = 0;
         }
-        this.update(id)
+        console.log(`Subtracting ${username}'s based counter: ${this.count(id)}`)
+        updateUserBased(id, this.count(id))
     }
 
     count(id) {
@@ -166,14 +161,12 @@ class BasedCounter {
     handleBasedReactions(reaction) {
         if (reaction.emoji.name === 'based') {
             this.add(reaction.message);
-            console.debug("Updated counter: ", this.based)
         }
     }
 
     handleBasedRemoval(reaction) {
         if (reaction.emoji.name === 'based') {
             this.remove(reaction.message);
-            console.debug("Updated counter: ", this.based)
         }
     }
 }
