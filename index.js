@@ -9,7 +9,7 @@ import { registerMohaa } from "./commands/mohaa.js";
 import { registerIntros } from "./commands/playintro.js";
 import { registerVoiceCommands } from "./commands/voice.js";
 
-
+console.debug = (config.debug ? console.log : function() {})
 console.log("Running in", (config.debug ? "DEBUG" : "PRODUCTION"), "mode")
 if (!config.debug || config.reloadRequired) import('./deploy-commands.js')
 
@@ -73,13 +73,13 @@ client.on('ready', () => {
 // All of these client events are just for logging
 client.on('messageCreate', async msg => {
     if (msg.author.bot || await checkPartial(msg)) return
-    if (config.debug && msg.channel.name !== 'bot-test') return
+    if (config.debug && msg.channel.name === 'bot-test') return
     console.debug(`${logHeader(msg)} ${msg.author.username}: ${msg.content}`)
 });
 
 client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot || await checkPartial(reaction)) return
-    if (config.debug && reaction.message.channel.name !== 'bot-testing') return
+    if (config.debug && reaction.message.channel.name === 'bot-testing') return
     console.debug(`${logHeader(reaction.message)} ${user.username} reacted to ${reaction.message.author.username} with ${reaction.emoji.name}`)
 });
 
