@@ -24,10 +24,14 @@ DB_USER=kamerad
 DB_PASS=
 DB_DATABASE=kamerad_bot
 DB_SOCKETPATH=/var/run/mysqld/mysqld.sock
+
+SOUND_FILES=
 ```
 This file is ignored by git by default. This software is made with the expectation that there is a testing bot and a seperate production bot. This can be ignored by using the same ID/Token for the TEST and DEPLOY variables.
 
 DB_PASS is something you'll have to decide when setting up the database.
+SOUND_FILES is the root folder where all the sound file will be referenced from.
+This includes the intro files and the mohaa sound files
 
 ### The rest
 1. Install MariaDB or related database onto device.

@@ -1,11 +1,12 @@
 import { connect } from './voice.js'
 import { SlashCommandBuilder } from '@discordjs/builders';
+import { config } from '#utils/config'
 
 import fs from 'fs/promises';
 import path from 'path';
 
-const germanDir = './sound/mohaa/g';
-const americanDir = './sound/mohaa/a';
+const germanDir = config.soundFiles + '/mohaa/g';
+const americanDir = config.soundFiles + '/mohaa/a';
 var germanAudio = {}
 var americanAudio = {}
 

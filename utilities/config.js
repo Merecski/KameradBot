@@ -14,7 +14,8 @@ const config = {
         database: isDebug ? process.env.DB_DATABASE_DEV : process.env.DB_DATABASE,
         socket: process.env.DB_SOCKET_PATH
     },
-    ignoreModules: [ 'command', 'testcmds' ]
+    ignoreModules: [ 'command', 'testcmds' ],
+    soundFiles: process.env.SOUND_FILES
 }
 
 const token = isDebug ? process.env.TEST_TOKEN : process.env.DEPLOY_TOKEN

@@ -3,6 +3,7 @@ import { Interaction } from 'discord.js'
 import { connect } from './voice.js'
 import { readdirSync } from 'fs'
 import { getUserIntro, updateUserIntro } from './playintro.fetch.js'
+import { config } from '#utils/config'
 
 /**
  * This is not important enough to be local. Stores the last date someone recieved their intro.
@@ -11,7 +12,7 @@ import { getUserIntro, updateUserIntro } from './playintro.fetch.js'
  */
 var lastPlayed = {}
 
-const introFileLocation = "./sound/intros/"
+const introFileLocation = config.soundFiles + "/intros/"
 var introFiles = readdirSync(introFileLocation);
 
 var user_intros = {}
