@@ -45,7 +45,10 @@ func (h dbHandler) version(w http.ResponseWriter, req *http.Request) {
 func (h dbHandler) getUsersData(w http.ResponseWriter, req *http.Request) {
 	user_row := db_users{}
 	all_users := []db_users{}
-	rows, _ := h.db.Query("SELECT * FROM users")
+	rows, err := h.db.Query("SELECT * FROM users")
+	if err != nil {
+		log.Printf("Failed to get user data: %v", err)
+	}
 	for rows.Next() {
 		rows.Scan(&user_row.UserId, &user_row.Username, &user_row.Bot, &user_row.Based, &user_row.IntroEnable, &user_row.IntroFile)
 		all_users = append(all_users, user_row)
@@ -164,9 +167,18 @@ func (h dbHandler) hello(w http.ResponseWriter, req *http.Request) {
 }
 
 func Run() {
+	var database, port string
+	isProd := os.Getenv("NODE_ENV") == "production"
 	user := os.Getenv("DB_USER")
 	pass := os.Getenv("DB_PASS")
-	database := os.Getenv("DB_DATABASE_DEV")
+	log.Printf("Is prod? %v", isProd)
+	if isProd {
+		database = os.Getenv("DB_DATABASE")
+		port = ":8080"
+	} else {
+		database = os.Getenv("DB_DATABASE_DEV")
+		port = ":8047"
+	}
 
 	db, err := sql.Open("mysql", user+":"+pass+"@/"+database)
 	if err != nil {
@@ -179,7 +191,6 @@ func Run() {
 		db: db,
 	}
 
-	port := ":8080"
 	r := mux.NewRouter()
 	r.HandleFunc("/", dbh.version)
 	r.HandleFunc("/version", dbh.version)

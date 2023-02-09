@@ -82,7 +82,6 @@ class YoutubePlayer {
     createPlayer(chan, url) {
         return new Promise((resolve, reject) =>{
             play.stream(url).then(stream => {
-                console.log(stream)
                 connect(chan, stream.stream, stream.type)
                 resolve()
             }).catch(error => {
