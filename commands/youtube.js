@@ -50,27 +50,28 @@ class YoutubePlayer {
                 interaction.reply('playing...');
                 this.createPlayer(voiceChannel, this.testurl);
                 // this.play(voiceChannel, this.testurl);
-            } else if (commandName === 'play') {
+            }
+            if (commandName === 'play') {
+                var url = ""
                 if (interaction.options.getSubcommand() === 'url') {
-                    console.log(`Connecting to ${member.voice.channel.name} with ${member.user.tag} !`);
-                    this.createPlayer(voiceChannel, interaction.options.getString('url'))
-                        .then((res) => {
-                            interaction.reply(`Playing ${interaction.options.getString('url')}`)
-                        }).catch(err => {
-                            interaction.reply(`${err.toString()}`)
-                        });
+                    url = interaction.options.getString('url')
+                    console.log(`Attempting to play via url: ${url}`)
                 } else if (interaction.options.getSubcommand() === 'search') {
-                    interaction.reply('playing...')
-                    console.log(`Connecting to ${member.voice.channel.name} with ${member.user.tag} !`);
                     const searchWords = interaction.options.getString('search')
-                    const url = await this.search(searchWords)
-                    if (url) {
-                        this.createPlayer(voiceChannel, url);
-                    } else {
-                        interaction.reply(`No results found for ${searchWords}`)
+                    url = await this.search(searchWords)
+                    if (!url) {
+                        interaction.reply({content: `No results found for ${searchWords}`, ephemeral: true})
+                        return
                     }
                 }
-
+                this.createPlayer(voiceChannel, url)
+                .then(() => {
+                    console.log(`Connecting to ${member.voice.channel.name} with ${member.user.tag} !`);
+                    interaction.reply(`Playing ${interaction.options.getString('url')}`)
+                }).catch(err => {
+                    console.log(`Failed to start youtube search player: ${err}`)
+                    interaction.reply(`Failed to start player :(`)
+                });
             }
        })
    }

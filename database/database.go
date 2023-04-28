@@ -60,6 +60,7 @@ func (h dbHandler) getUsersData(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("content-type", "application/json")
 	w.Write(data)
 }
 
@@ -76,6 +77,7 @@ func (h dbHandler) getUserData(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("content-type", "application/json")
 	w.Write(data)
 }
 
@@ -183,9 +185,11 @@ func Run() {
 	db, err := sql.Open("mysql", user+":"+pass+"@/"+database)
 	if err != nil {
 		log.Fatal("Failed to connect to database")
+		return
 	}
-	log.Println("Connected to database")
 	defer db.Close()
+	db.SetConnMaxLifetime(0)
+	log.Println("Connected to database")
 
 	dbh := dbHandler{
 		db: db,

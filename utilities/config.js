@@ -12,10 +12,12 @@ const config = {
         user: process.env.DB_USER,
         pass: process.env.DB_PASS,
         database: isDebug ? process.env.DB_DATABASE_DEV : process.env.DB_DATABASE,
-        socket: process.env.DB_SOCKET_PATH
+        socket: process.env.DB_SOCKET_PATH,
+        addr: '127.0.0.1:' + (isDebug ? '8047' : '8080'),
     },
     ignoreModules: [ 'command', 'testcmds' ],
     soundFiles: process.env.SOUND_FILES
+    
 }
 
 const token = isDebug ? process.env.TEST_TOKEN : process.env.DEPLOY_TOKEN

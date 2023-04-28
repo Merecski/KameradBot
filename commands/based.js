@@ -55,6 +55,10 @@ class BasedCounter {
     loadData() {
         getUserBased()
         .then(result => {
+            if (!result) {
+                console.log("FAILED to load based data. Response:", result)
+                return
+            }
             for (const user of result) {
                 this.based[user.userid] = user.based;
             }

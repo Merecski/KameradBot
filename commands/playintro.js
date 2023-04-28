@@ -54,6 +54,10 @@ function registerIntros(client) {
 function loadIntroData() {
     getUserIntro()
     .then( (data) => {
+        if (!data) {
+            console.log("FAILED to load based data. Response:", data)
+            return
+        }
         data.forEach(({userid, intro_enable, intro_file}) => {
             user_intros[userid] = new UserIntros(intro_enable, intro_file)
         })
@@ -74,12 +78,18 @@ var introFunctions = {
  */
 function addIntro(interaction) {
     var filename = interaction.options.getString('filename')
+    var targetUser = interaction.options.getString('user')
     if (!introFiles.includes(filename)) {
         interaction.reply({content: `Intro file not found.`, ephemeral: true});
         return;
     }
-    console.log(`Adding ${filename} as ${interaction.user.id} intro`)
-    updateUserIntro(interaction.user.id, true, filename)
+    if (!targetUser) targetUser = interaction.user.id
+    console.log(`Adding ${filename} as ${targetUser} intro`)
+    updateUserIntro(targetUser, true, filename)
+    .then(() => {
+        user_intros[targetUser].intro_file = filename
+        interaction.reply({content: `Added intro file`, ephemeral: true});
+    })
 }
 
 /**
@@ -89,7 +99,10 @@ function addIntro(interaction) {
  */
 function removeIntro(interaction) {
     updateUserIntro(interaction.user.id, false, "")
-    interaction.reply({content: `Removed intro filename.`, ephemeral: true});
+    .then(() => {
+        user_intros[interaction.user.id].intro_file = ""
+        interaction.reply({content: `Removed intro filename.`, ephemeral: true});
+    })
 }
 
 /**
@@ -98,8 +111,14 @@ function removeIntro(interaction) {
  * @returns 
  */
 function enableIntro(interaction) {
+    console.log("command enable start")
+
     updateUserIntro(interaction.user.id, true, user_intros[interaction.user.id].intro_file)
-    interaction.reply({content: `Enabled intro.`, ephemeral: true});
+    .then((text) => {
+        console.log("text", text)
+        user_intros[interaction.user.id].intro_enable = true
+        interaction.reply({content: `Enabled intro.`, ephemeral: true});
+    })
 }
 
 /**
@@ -109,7 +128,10 @@ function enableIntro(interaction) {
  */
 function disableIntro(interaction) {
     updateUserIntro(interaction.user.id, false, user_intros[interaction.user.id].intro_file)
-    interaction.reply({content: `Disabled intro.`, ephemeral: true});
+    .then(() => {
+        user_intros[interaction.user.id].intro_enable = false
+        interaction.reply({content: `Disabled intro.`, ephemeral: true});
+    })
 }
 
 function checkRunIntros(joinId, channel) {
@@ -134,8 +156,8 @@ const commands = [
         .addSubcommand(subcommand => subcommand.setName("enable").setDescription('Enable intro for user'))
         .addSubcommand(subcommand => subcommand.setName("disable").setDescription('Disable intro for user'))
         .addSubcommand(subcommand => subcommand.setName("add").setDescription('Add intro for user')
-            .addStringOption(option => 
-                option.setName('filename').setDescription('filename of .mp3')))
+            .addStringOption(option => option.setName('filename').setDescription('filename of .mp3'))
+            .addStringOption(option => option.setName('user').setDescription('Target user of intro. Leave blank for yourself')))
         .addSubcommand(subcommand => subcommand.setName("remove").setDescription('Remove intro for user')
             .addUserOption(option => option.setName('user').setDescription('Remove user\'s intro')))
 

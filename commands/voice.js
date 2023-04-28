@@ -30,7 +30,7 @@ const timeoutDisconnect = (player, conn) => {
     timer = setTimeout(() => {
         player.stop()
         // This keeps causing errors. Find a better way
-        //conn.destroy()
+        conn.destroy()
       }, 30 * 60 * 1000); // 30 minutes
   }
 
@@ -77,6 +77,7 @@ function connect(channel, stream, options) {
             if (!player) {
                 console.log(`Creating new AudioPlayer for Guild[${voiceConnId}]`)
                 player = createAudioPlayer( {
+                    inputType: stream.type,
                     noSubscriber: 'Pause'
                 });
                 addPlayerListeners(player, connection)

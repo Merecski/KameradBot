@@ -1,6 +1,7 @@
 
 import fetch from "node-fetch";
 import { getUsers } from "../database/basic.fetch.js";
+import { config } from "../utilities/config.js";
 
 
 /**
@@ -19,7 +20,7 @@ function updateUserBased(id, based) {
         for (const [key, value] of Object.entries(newData)) {
             data[key] = value
         }
-        fetch('http://127.0.0.1:8080/users', {
+        fetch(`http://${config.db.addr}/users`, {
             method: 'POST',
             body: JSON.stringify(data),
             headers: {
