@@ -30,8 +30,8 @@ const timeoutDisconnect = (player, conn) => {
     timer = setTimeout(() => {
         player.stop()
         // This keeps causing errors. Find a better way
-        conn.destroy()
-      }, 30 * 60 * 1000); // 30 minutes
+        if (conn) conn.destroy()
+      }, 2 * 60 * 1000); // 2 minutes
   }
 
 function registerVoiceCommands(client) {
@@ -70,6 +70,7 @@ function connect(channel, stream, options) {
                     guildId: voiceConnId,
                     adapterCreator: channel.guild.voiceAdapterCreator,
                 });
+
                 addVoiceConnListeners(connection)
             }
 
@@ -126,22 +127,31 @@ function stop(chan) {
 
 function addVoiceConnListeners(connection) {
     connection.on(VoiceConnectionStatus.Disconnected, async (oldState, newState) => {
+        console.log('connection.on(VoiceConnectionStatus.Disconnected, async (oldState, newState) => {')
         try {
             await Promise.race([
                 entersState(connection, VoiceConnectionStatus.Signalling, 5_000),
                 entersState(connection, VoiceConnectionStatus.Connecting, 5_000),
             ]);
+            console.log('await Promise.race([ occured')
             // Seems to be reconnecting to a new channel - ignore disconnect
         } catch (error) {
             // Seems to be a real disconnect which SHOULDN'T be recovered from
-            connection.destroy();
+            console.log('addVoiceConnListeners: failed to make promise?')
+            if (connection) connection.destroy();
         }
     });
+
+    // Reconnect if somehow the bot was disconnected
+    connection.on("disconnect", () => {
+        let channel = client.channels.cache.get(channel) || client.channels.fetch(channel)
+        const dispatcher = channel.join()
+      })
 }
 
 function addPlayerListeners(player, connection) {
     player.on("error", (error) => {
-        connection.destroy()
+        if (connection) connection.destroy()
         console.error('Player broke :(', error)
     })
 
