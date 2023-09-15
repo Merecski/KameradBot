@@ -4,13 +4,11 @@ import { joinVoiceChannel, createAudioResource, createAudioPlayer, NoSubscriberB
 import { getVoiceConnection } from '@discordjs/voice'
 import play from 'play-dl'; // Everything
 
-const testFile = "INVALID_FILE"
+import { PlayerResource } from "#utils/player.resource"
 
-/**
- * @param {Object} guildId ID of the guild
- * @param {Object} [guildId.AudioPlayer] Unique player for the guild
- */
-let audioPlayer = {}
+const testFile = "/home/pi/Music/sfw/OK_I_PULL_UP.mp3"
+
+let playerResource = new PlayerResource()
 
 async function playAudio(interaction) {
     console.log(`Test: ${interaction.member.voice?.channel.name}`)
@@ -29,10 +27,15 @@ async function playAudio(interaction) {
         adapterCreator: guild.voiceAdapterCreator
     })
 
-    if (interaction.options.getSubcommand() !== 'url') {
-        await interaction.reply('URL failed');
-        return
-    }
+    /**
+     *  TODO: THERE IS A BUG HERE THAT SAYS NO SUBCOMMAND EVEN THOUGH THERE IS.
+     *        Please fix this ASAP. Maybe since it's requried it is not needed?
+     */
+    // console.log("DEBUG", interaction.options)
+    // if (interaction.options.getSubcommand() !== 'url') {
+    //     await interaction.reply('URL failed');
+    //     return
+    // }
     
     /*
     if you want to get info about youtube link and then stream it
@@ -42,8 +45,8 @@ async function playAudio(interaction) {
     let stream = await play.stream_from_info(yt_info)
     */
 
-    let resource
-    const url = interaction.options.getString('url')
+    let resource;
+    let url = interaction.options.getString('url')
     if (url !== 'test') {
         console.log(`Attempting to play via url: ${url}`)
     
@@ -58,19 +61,10 @@ async function playAudio(interaction) {
         resource = createAudioResource(url)
     }
 
-
-    player = createAudioPlayer({
-        behaviors: {
-            noSubscriber: NoSubscriberBehavior.Play
-        }
-    })
-
-    player.play(resource)
+    let player = playerResource.playPlayer(interaction.guildId, resource)
 
     // Subscribe the connection to the audio player (will play audio on the voice connection)
-    const subscription = connection.subscribe(player);
-
-    
+    const subscription = connection.subscribe(player)
 
     // // subscription could be undefined if the connection is destroyed!
     // if (subscription) {
@@ -78,7 +72,7 @@ async function playAudio(interaction) {
     //     setTimeout(() => subscription.unsubscribe(), 5_000);
     // }
 
-    audioPlayer[interaction.guildId] = player
+    // audioPlayer[interaction.guildId] = player
     await interaction.reply(`Playing video: ${url}`)
 }
 
@@ -89,6 +83,7 @@ async function destroyAudio(interaction) {
     }
 
     const connection = getVoiceConnection(interaction.guildId)
+    playerResource.pausePlayer(interaction.guildId)
     connection.destroy()
     await interaction.reply('Stopped audio player')
 }
@@ -98,15 +93,7 @@ async function pauseAudio(interaction) {
         await interaction.reply('Not in voice channel')
         return
     }
-
-    const id = interaction.guildId
-
-    if (audioPlayer.hasOwn(id)) {
-        audioPlayer[id].pause()
-        await interaction.reply('Stopped audio player')
-    } else {
-        await interaction.reply('No player avaliable')
-    }
+    playerResource.pausePlayer(interaction.guildId)
 }
 
 async function resumeAudio(interaction) {
@@ -115,8 +102,34 @@ async function resumeAudio(interaction) {
         return
     }
 
-    audioPlayer.unpause()
+    playerResource.resumePlayer()
     await interaction.reply('Stopped audio player')
+}
+
+async function queueAudio(interaction) {
+    if (!interaction.member.voice?.channel) {
+        await interaction.reply('Not in voice channel')
+        return
+    }
+    let url = interaction.options.getString('url')
+    let stream = await play.stream(url)
+    
+    console.log(`Attempting to createAudioResource via url: ${url}`)
+    let resource = createAudioResource(stream.stream, {
+        inputType: stream.type
+    })
+    playerResource.addQueue(interaction.guildId, resource)
+    await interaction.reply(`Song Queued: ${url}`)
+}
+
+async function skipAudio(interaction) {
+    if (!interaction.member.voice?.channel) {
+        await interaction.reply('Not in voice channel')
+        return
+    }
+
+    playerResource.skipPlayer(interaction.guildId)
+    await interaction.reply(`Song skipped`)
 }
 
 const commands = [
@@ -147,6 +160,22 @@ const commands = [
             .setName('resume')
             .setDescription('Resume audio'),
         execute: resumeAudio
+    },
+    {
+        data: new SlashCommandBuilder()
+            .setName('queue')
+            .setDescription('Queues audio to be played')
+            .addStringOption(option =>
+                option.setName('url')
+                    .setDescription('url of video')
+                    .setRequired(true)),
+        execute: queueAudio
+    },
+    {
+        data: new SlashCommandBuilder()
+            .setName('skip')
+            .setDescription('Skips the song'),
+        execute: skipAudio
     }
 ]
 

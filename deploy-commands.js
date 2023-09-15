@@ -1,7 +1,8 @@
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { config, token } from '#utils/config'
-import fs from 'fs/promises'
+
+import fs from 'fs'
 import path from 'path'
 
 // Prevent the testing bot and produciton bot from overlapping
@@ -11,42 +12,59 @@ const test = config.debug ? 'test_' : ''
 /**
  * Dynamically loads in command modules. This allows for last minute modificaitons
  * or ignore list from config.
- * @param {String} guildIDs Array of strings pertaining to the guild's ID to register to
+ * @param {String} guildIds Array of strings pertaining to the guild's ID to register to
  */
-export default async function registerCommands(guildIDs) {
-    const absolutePath = path.resolve('./commands');
+export default async function registerCommands(guildIds) {
+	console.log("Registering in debug?", config.debug)
+    // const absolutePath = path.resolve('./commands');
 	console.log('Not loading modules:', config.ignoreModules)
-	var cmds = []
-	var files = await fs.readdir(absolutePath)
-	files = files.filter(filename => {
-		// Remove ignored modules
-		const file = path.parse(filename)
-		return file.ext === '.js' && !config.ignoreModules.includes(file.name)
-	})
-	for (const file of files) {
-		// Add all .js modules with commands into main list
-		const { commands } = await import(path.join(absolutePath, file))
-		if (commands) cmds = cmds.concat(commands)
+	let registerCommands = [];
+	
+	const foldersPath = path.join(path.resolve(), 'commands');
+	const commandFolders = fs.readdirSync(foldersPath)
+	console.log('Checking subfolders:', commandFolders)
+	
+	for (const folder of commandFolders) {
+		const commandsPath = path.join(foldersPath, folder);
+		const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+		for (const file of commandFiles) {
+			const filePath = path.join(commandsPath, file);
+			const { commands } = await import(filePath);
+		
+			// Commands are a list of commands for each file
+			for (const command of commands) {
+				// Set a new item in the Collection with the key as the command name and the value as the exported module
+				if ('data' in command && 'execute' in command) {
+					console.log(`Registering command: "${command.data.name}"`)
+					registerCommands.push(command.data.toJSON());
+				} else {
+					console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+				}
+			}
+		}
 	}
 
-	// Convert all commands to json to prep for registration
-	cmds = cmds.map(command => command.toJSON())
-	console.log("All avaliable commands:", cmds.map(c => c.name))
+	console.log("All avaliable commands:", registerCommands.map(c => c.name))
 
-	const rest = new REST({ version: '9' }).setToken(token);
+	// Construct and prepare an instance of the REST module
+	const rest = new REST().setToken(token);
 
-	for (const guildID of guildIDs) {
+	for (const guildId of guildIds) {
+		// and deploy your commands!
 		(async () => {
 			try {
-				console.log(`Started refreshing application (/) commands for ${guildID}.`);
-				await rest.put(
-					Routes.applicationGuildCommands(config.clientID, guildID),
-					{ body: cmds },
+				console.log(`Started refreshing ${registerCommands.length} application (/) commands for ${guildId}`);
+	
+				// The put method is used to fully refresh all commands in the guild with the current set
+				const data = await rest.put(
+					Routes.applicationGuildCommands(config.clientID, guildId),
+					{ body: registerCommands },
 				);
-				console.log(`Successfully reloaded application (/) commands for ${guildID}.`);
+	
+				console.log(`Successfully reloaded ${data.length} application (/) command  for ${guildId}`);
 			} catch (error) {
+				// And of course, make sure you catch and log any errors!
 				console.error(error);
-				process.exit(1)
 			}
 		})();
 	}
