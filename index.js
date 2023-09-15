@@ -12,12 +12,13 @@ const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildVoiceStates,
         GatewayIntentBits.GuildEmojisAndStickers
     ],
     partials: [
         Partials.Channel,
         Partials.Message,
-        Partials.Reaction
+        Partials.Reaction,
     ],
 });
 
@@ -38,22 +39,29 @@ const client = new Client({
 
 client.commands = new Collection();
 
-const commandsPath = path.join(path.resolve(), 'commands');
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-for (const file of commandFiles) {
-	const filePath = path.join(commandsPath, file);
-	const { commands } = await import(filePath);
+const foldersPath = path.join(path.resolve(), 'commands');
+const commandFolders = fs.readdirSync(foldersPath)
 
-    // Commands are a list of commands for each file
-    for (const command of commands) {
-        // Set a new item in the Collection with the key as the command name and the value as the exported module
-        if ('data' in command && 'execute' in command) {
-            client.commands.set(command.data.name, command);
-        } else {
-            console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+for (const folder of commandFolders) {
+	const commandsPath = path.join(foldersPath, folder);
+	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+    for (const file of commandFiles) {
+        const filePath = path.join(commandsPath, file);
+        const { commands } = await import(filePath);
+    
+        // Commands are a list of commands for each file
+        for (const command of commands) {
+            // Set a new item in the Collection with the key as the command name and the value as the exported module
+            if ('data' in command && 'execute' in command) {
+                console.log(`Registering command: "${command.data.name}"`)
+                client.commands.set(command.data.name, command);
+            } else {
+                console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+            }
         }
     }
 }
+
 
 client.once(Events.ClientReady, c => {
     console.log(`Ready! Logged in as ${c.user.tag}`);
