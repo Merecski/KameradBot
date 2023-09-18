@@ -90,15 +90,13 @@ console.log(client.commands.map(cmd => cmd.data.name))
 
 
 client.once(Events.ClientReady, c => {
-    console.log(`Ready! Logged in as ${c.user.tag}`);
     const guilds = client.guilds.cache.map(guild => guild.id);
+    console.log(`Ready! Logged in as ${c.user.tag}`);
     console.log("Accessing these guilds:", client.guilds.cache.map(guild => guild.name));
-
-    // if (!config.debug) {
-    //     const guilds = client.guilds.cache.map(guild => guild.id);
-    //     console.log("Registering guilds:", guilds);
-    //     registerCommands(guilds);
-    // }
+    if (!config.debug) {
+        console.log("Registering commands to guild");
+        registerCommands(guilds);
+    }
 });
 
 /**

@@ -71,6 +71,5 @@ export default async function registerCommands(guildIds) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-	const guildIds = ['809978075189739562'] // Western
-	registerCommands(process.env.GUILD_BOT_TESTING)
+	registerCommands([process.env.GUILD_BOT_TESTING])
 }
