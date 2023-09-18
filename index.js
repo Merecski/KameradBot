@@ -34,16 +34,33 @@ client.player = new PlayerResource()
 /**
  *  Commands not for the public
  */
-// try {
-//     const { registerSecret } = await import("./commands/secret.js");
-//     registerSecret(client);
-// } catch(error) {
-//     if (error.code === "ERR_MODULE_NOT_FOUND") {
-//         console.log('Ignoring missing optional module')
-//     } else {
-//         throw error
-//     }
-// }
+try {
+    client.secretCommands = new Collection();
+    const commandsPath = path.join(path.resolve(), 'commands/secret');
+	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+    for (const file of commandFiles) {
+        const filePath = path.join(commandsPath, file);
+        const { commands } = await import(filePath);
+    
+        // Commands are a list of commands for each file
+        for (const command of commands) {
+            // Set a new item in the Collection with the key as the command name and the value as the exported module
+            if ('data' in command && 'execute' in command) {
+                client.secretCommands.set(command.data.name, command);
+            } else {
+                console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+            }
+        }
+    }
+    console.log(`Registered secret commands:"`)
+    console.log(client.secretCommands.map(cmd => cmd.data.name))
+} catch(error) {
+    if (error.code === "ERR_MODULE_NOT_FOUND") {
+        console.log('Ignoring missing optional module')
+    } else {
+        throw error
+    }
+}
 
 client.commands = new Collection();
 const foldersPath = path.join(path.resolve(), 'commands');
