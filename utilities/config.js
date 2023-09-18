@@ -15,7 +15,7 @@ const config = {
         socket: process.env.DB_SOCKET_PATH,
         addr: '127.0.0.1:' + (isDebug ? '8047' : '8080'),
     },
-    ignoreModules: [ 'command', 'testcmds' ],
+    ignoreModules: [ 'secret', 'testcmds' ],
     soundFiles: process.env.SOUND_FILES
     
 }

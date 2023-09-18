@@ -16,13 +16,12 @@ const test = config.debug ? 'test_' : ''
  */
 export default async function registerCommands(guildIds) {
 	console.log("Registering in debug?", config.debug)
-    // const absolutePath = path.resolve('./commands');
 	console.log('Not loading modules:', config.ignoreModules)
 	let registerCommands = [];
 	
 	const foldersPath = path.join(path.resolve(), 'commands');
-	const commandFolders = fs.readdirSync(foldersPath)
-	console.log('Checking subfolders:', commandFolders)
+	const commandFolders = fs.readdirSync(foldersPath).filter(folder => !config.ignoreModules.includes(folder))
+	console.log('Checking subfolders for commands:', commandFolders)
 	
 	for (const folder of commandFolders) {
 		const commandsPath = path.join(foldersPath, folder);
@@ -35,7 +34,6 @@ export default async function registerCommands(guildIds) {
 			for (const command of commands) {
 				// Set a new item in the Collection with the key as the command name and the value as the exported module
 				if ('data' in command && 'execute' in command) {
-					console.log(`Registering command: "${command.data.name}"`)
 					registerCommands.push(command.data.toJSON());
 				} else {
 					console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
