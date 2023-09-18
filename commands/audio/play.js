@@ -8,10 +8,10 @@ import { PlayerResource } from "#utils/player.resource"
 
 const testFile = "/home/pi/Music/sfw/OK_I_PULL_UP.mp3"
 
-let playerResource = new PlayerResource()
+// let playerResource = new PlayerResource()
 
 async function playAudio(interaction) {
-    console.log(`Test: ${interaction.member.voice?.channel.name}`)
+    console.log(`Joining: ${interaction.member.voice?.channel.name}`)
     if (!interaction.member.voice?.channel) {
         await interaction.reply('Not in voice channel');
         return
@@ -47,21 +47,20 @@ async function playAudio(interaction) {
 
     let resource;
     let url = interaction.options.getString('url')
-    if (url !== 'test') {
-        console.log(`Attempting to play via url: ${url}`)
-    
+    console.log(`Attempting to play via url: ${url}`)
+
+    try {
         let stream = await play.stream(url)
-    
         resource = createAudioResource(stream.stream, {
             inputType: stream.type
         })
-    } else {
-        url = testFile
-        console.log(`Attempting to play: ${url}`)
-        resource = createAudioResource(url)
+    } catch (error) {
+        console.log(error)
+        await interaction.reply(`Failed to play: ${url}\nCheck error logs`)
     }
 
-    let player = playerResource.playPlayer(interaction.guildId, resource)
+
+    let player = interaction.client.player.playPlayer(interaction.guildId, resource)
 
     // Subscribe the connection to the audio player (will play audio on the voice connection)
     const subscription = connection.subscribe(player)
@@ -83,9 +82,13 @@ async function destroyAudio(interaction) {
     }
 
     const connection = getVoiceConnection(interaction.guildId)
-    playerResource.pausePlayer(interaction.guildId)
-    connection.destroy()
-    await interaction.reply('Stopped audio player')
+    if (connection) {
+        interaction.client.player.pausePlayer(interaction.guildId)
+        connection.destroy()
+        await interaction.reply('Stopped audio player')
+    } else {
+        await interaction.reply('Player already stopped')
+    }
 }
 
 async function pauseAudio(interaction) {
@@ -93,7 +96,7 @@ async function pauseAudio(interaction) {
         await interaction.reply('Not in voice channel')
         return
     }
-    playerResource.pausePlayer(interaction.guildId)
+    interaction.client.player.pausePlayer(interaction.guildId)
 }
 
 async function resumeAudio(interaction) {
@@ -102,7 +105,7 @@ async function resumeAudio(interaction) {
         return
     }
 
-    playerResource.resumePlayer()
+    interaction.client.player.resumePlayer()
     await interaction.reply('Stopped audio player')
 }
 
@@ -118,7 +121,7 @@ async function queueAudio(interaction) {
     let resource = createAudioResource(stream.stream, {
         inputType: stream.type
     })
-    playerResource.addQueue(interaction.guildId, resource)
+    interaction.client.player.addQueue(interaction.guildId, resource)
     await interaction.reply(`Song Queued: ${url}`)
 }
 
@@ -128,7 +131,7 @@ async function skipAudio(interaction) {
         return
     }
 
-    playerResource.skipPlayer(interaction.guildId)
+    interaction.client.player.skipPlayer(interaction.guildId)
     await interaction.reply(`Song skipped`)
 }
 

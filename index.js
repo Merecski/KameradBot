@@ -2,6 +2,7 @@ import { config, token } from '#utils/config'
 import { Client, GatewayIntentBits, Partials, Collection, Events } from 'discord.js'
 import fs from 'fs'
 import path from 'path'
+import { PlayerResource } from "#utils/player.resource"
 
 
 console.debug = (config.debug ? console.log : function() {})
@@ -12,6 +13,7 @@ const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildVoiceStates,
         GatewayIntentBits.GuildEmojisAndStickers
     ],
@@ -21,6 +23,12 @@ const client = new Client({
         Partials.Reaction,
     ],
 });
+
+/**
+ * Create a single player resource manager to the 
+ * client to be accessed globally
+ */
+client.player = new PlayerResource()
 
 
 /**
@@ -38,9 +46,8 @@ const client = new Client({
 // }
 
 client.commands = new Collection();
-
 const foldersPath = path.join(path.resolve(), 'commands');
-const commandFolders = fs.readdirSync(foldersPath)
+const commandFolders = fs.readdirSync(foldersPath).filter(folder => path.basename(folder) !== "secret")
 
 for (const folder of commandFolders) {
 	const commandsPath = path.join(foldersPath, folder);
@@ -53,7 +60,6 @@ for (const folder of commandFolders) {
         for (const command of commands) {
             // Set a new item in the Collection with the key as the command name and the value as the exported module
             if ('data' in command && 'execute' in command) {
-                console.log(`Registering command: "${command.data.name}"`)
                 client.commands.set(command.data.name, command);
             } else {
                 console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
@@ -62,9 +68,20 @@ for (const folder of commandFolders) {
     }
 }
 
+console.log(`Registered commands:"`)
+console.log(client.commands.map(cmd => cmd.data.name))
+
 
 client.once(Events.ClientReady, c => {
     console.log(`Ready! Logged in as ${c.user.tag}`);
+    const guilds = client.guilds.cache.map(guild => guild.id);
+    console.log("Accessing these guilds:", client.guilds.cache.map(guild => guild.name));
+
+    // if (!config.debug) {
+    //     const guilds = client.guilds.cache.map(guild => guild.id);
+    //     console.log("Registering guilds:", guilds);
+    //     registerCommands(guilds);
+    // }
 });
 
 /**
@@ -87,58 +104,39 @@ client.on(Events.InteractionCreate, async interaction => {
 		await command.execute(interaction);
 	} catch (error) {
 		console.error(error);
-		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+		if (!(interaction.replied || interaction.deferred)) {
+			await interaction.followUp({ content: 'There was an error that I am aware about', ephemeral: true });
 		} else {
-			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+			await interaction.reply({ content: `There was an unexpected error!\nGo bug Mike about the issue:\n${error}`, ephemeral: true });
 		}
 	}
 });
 
-/**
- *  OLD CODE TO BE SORTED
- */
+function logHeader(msg) {
+    return `[${msg.guild.name}][${msg.channel.name}]`
+}
 
-// function logHeader(msg) {
-//     return `[${msg.guild.name}][${msg.channel.name}]`
-// }
+// All of these client events are just for logging
+client.on('messageCreate', async msg => {
+    if (msg.author.bot) return
+    // if (config.debug && msg.channel.name === 'bot-test') return
+    console.debug(`${logHeader(msg)} ${msg.author.username}: ${msg}`)
+    if (msg.content.startsWith('\\')) {
+        const command = msg.client.secretCommands.get(msg.content.slice(1));
+        if (!command) {
+            await msg.reply(`${msg.content.slice(1)}?`);
+            return;
+        }
+        console.log(`Running secret command: '${command.data.name}'`);
+		await command.execute(msg);
+    }
+});
 
-// // Interaction setup
-// client.on('interactionCreate', async interaction => {
-// 	if (!interaction.isCommand()) return;
-// 	const { commandName } = interaction;
-
-// 	if (commandName === 'ping') {
-// 		await interaction.reply('Pong!');
-// 	} else if (commandName === 'server') {
-// 		await interaction.reply(`Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`);
-// 	} else if (commandName === 'user') {
-// 		await interaction.reply(`Your tag: ${interaction.user.tag}\nYour id: ${interaction.user.id}`);
-//     }
-// });
-
-// // Module event setup
-// client.on('ready', () => {
-//     console.log(`Logged in as ${client.user.tag}!`);
-//     if (!config.debug) {
-//         const guilds = client.guilds.cache.map(guild => guild.id);
-//         console.log("Registering guilds:", guilds);
-//         registerCommands(guilds);
-//     }
-// });
-
-// // All of these client events are just for logging
-// client.on('messageCreate', async msg => {
-//     if (msg.author.bot || await checkPartial(msg)) return
-//     if (config.debug && msg.channel.name === 'bot-test') return
-//     console.debug(`${logHeader(msg)} ${msg.author.username}: ${msg.content}`)
-// });
-
-// client.on('messageReactionAdd', async (reaction, user) => {
-//     if (user.bot || await checkPartial(reaction)) return
-//     if (config.debug && reaction.message.channel.name === 'bot-testing') return
-//     console.debug(`${logHeader(reaction.message)} ${user.username} reacted to ${reaction.message.author.username} with ${reaction.emoji.name}`)
-// });
+client.on('messageReactionAdd', async (reaction, user) => {
+    if (user.bot) return
+    if (config.debug && reaction.message.channel.name === 'bot-testing') return
+    console.debug(`${logHeader(reaction.message)} ${user.username} reacted to ${reaction.message.author.username} with ${reaction.emoji.name}`)
+});
 
 try {
     client.login(token);
