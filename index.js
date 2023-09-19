@@ -3,6 +3,7 @@ import { Client, GatewayIntentBits, Partials, Collection, Events } from 'discord
 import fs from 'fs'
 import path from 'path'
 import { PlayerResource } from "#utils/player.resource"
+import registerCommands from "./deploy-commands.js"
 
 
 console.debug = (config.debug ? console.log : function() {})
