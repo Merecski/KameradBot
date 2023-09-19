@@ -88,6 +88,13 @@ for (const folder of commandFolders) {
 console.log(`Registered commands:"`)
 console.log(client.commands.map(cmd => cmd.data.name))
 
+function logHeader(msg) {
+    return `[${msg.guild.name}][${msg.channel.name}]`
+}
+
+function fLog(msg, output) {
+    console.log(logHeader(msg), output)
+}
 
 client.once(Events.ClientReady, c => {
     const guilds = client.guilds.cache.map(guild => guild.id);
@@ -115,7 +122,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 
 	try {
-        console.log(`Running command: '${command.data.name}'`);
+        console.log(`BOT-Executing: '${command.data.name}'`)
 		await command.execute(interaction);
 	} catch (error) {
 		console.error(error);
@@ -126,10 +133,6 @@ client.on(Events.InteractionCreate, async interaction => {
 		}
 	}
 });
-
-function logHeader(msg) {
-    return `[${msg.guild.name}][${msg.channel.name}]`
-}
 
 // All of these client events are just for logging
 client.on('messageCreate', async msg => {

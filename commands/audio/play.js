@@ -1,22 +1,19 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { joinVoiceChannel, createAudioResource, createAudioPlayer, NoSubscriberBehavior, AudioPlayer } from '@discordjs/voice'
-// import { VoiceConnectionStatus, AudioPlayerStatus } from '@discordjs/voice'
-import { getVoiceConnection } from '@discordjs/voice'
 import play from 'play-dl'; // Everything
 
-import { PlayerResource } from "#utils/player.resource"
 
 const testFile = "/home/pi/Music/sfw/OK_I_PULL_UP.mp3"
 
 // let playerResource = new PlayerResource()
 
 async function playAudio(interaction) {
-    console.log(`Joining: ${interaction.member.voice?.channel.name}`)
     if (!interaction.member.voice?.channel) {
         await interaction.reply('Not in voice channel');
         return
     }
-
+    console.log(`Joining: ${interaction.member.voice?.channel.name}`)
+    
     const guild = interaction.client.guilds.cache.get(interaction.guildId); // Getting the guild.
     const member = guild.members.cache.get(interaction.user.id); // Getting the member.
     const voiceChannel = member.voice.channel
@@ -37,26 +34,21 @@ async function playAudio(interaction) {
     //     return
     // }
     
-    /*
-    if you want to get info about youtube link and then stream it
-
-    let yt_info = await play.video_info(args)
-    console.log(yt_info.video_details.title) 
-    let stream = await play.stream_from_info(yt_info)
-    */
-
     let resource;
     let url = interaction.options.getString('url')
-    console.log(`Attempting to play via url: ${url}`)
-
+    
     try {
         let stream = await play.stream(url)
         resource = createAudioResource(stream.stream, {
-            inputType: stream.type
+            inputType: stream.type,
+            metadata: {
+                title: yt_info.video_details.title
+            }
         })
     } catch (error) {
         console.log(error)
-        await interaction.reply(`Failed to play: ${url}\nCheck error logs`)
+        await interaction.reply(`Failed to play: '${url}'\nYou probably entered the url wrong. Get Mike to check error logs`)
+        return
     }
 
 
@@ -80,15 +72,8 @@ async function destroyAudio(interaction) {
         await interaction.reply('Not in voice channel')
         return
     }
-
-    const connection = getVoiceConnection(interaction.guildId)
-    if (connection) {
-        interaction.client.player.pausePlayer(interaction.guildId)
-        connection.destroy()
-        await interaction.reply('Stopped audio player')
-    } else {
-        await interaction.reply('Player already stopped')
-    }
+    interaction.client.player.stopPlayer(interaction.guildId)
+    await interaction.reply('Stopped audio player')
 }
 
 async function pauseAudio(interaction) {
@@ -97,6 +82,7 @@ async function pauseAudio(interaction) {
         return
     }
     interaction.client.player.pausePlayer(interaction.guildId)
+    await interaction.reply('Paused audio player')
 }
 
 async function resumeAudio(interaction) {
@@ -105,8 +91,8 @@ async function resumeAudio(interaction) {
         return
     }
 
-    interaction.client.player.resumePlayer()
-    await interaction.reply('Stopped audio player')
+    interaction.client.player.resumePlayer(interaction.guildId)
+    await interaction.reply('Resumed audio player')
 }
 
 async function queueAudio(interaction) {
