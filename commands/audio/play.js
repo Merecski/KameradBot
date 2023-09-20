@@ -40,10 +40,7 @@ async function playAudio(interaction) {
     try {
         let stream = await play.stream(url)
         resource = createAudioResource(stream.stream, {
-            inputType: stream.type,
-            metadata: {
-                title: yt_info.video_details.title
-            }
+            inputType: stream.type
         })
     } catch (error) {
         console.log(error)

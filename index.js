@@ -31,54 +31,31 @@ const client = new Client({
  */
 client.player = new PlayerResource()
 
-
 /**
- *  Commands not for the public
+ * Register all the commands
  */
-try {
-    client.secretCommands = new Collection();
-    const commandsPath = path.join(path.resolve(), 'commands/secret');
-    if (fs.existsSync(commandsPath)) {
-        const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-        for (const file of commandFiles) {
-            const filePath = path.join(commandsPath, file);
-            const { commands } = await import(filePath);
-        
-            // Commands are a list of commands for each file
-            for (const command of commands) {
-                // Set a new item in the Collection with the key as the command name and the value as the exported module
-                if ('data' in command && 'execute' in command) {
-                    client.secretCommands.set(command.data.name, command);
-                } else {
-                    console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-                }
-            }
-        }
-        console.log(`Registered secret commands:"`)
-        console.log(client.secretCommands.map(cmd => cmd.data.name))
-    } else {
-        console.log("Secrets directory missing... Skipping any of that")
-    }
-} catch(error) {
-    console.log("FAILED to register secret commands:\n", error)
-}
-
 client.commands = new Collection();
+client.secretCommands = new Collection();
 const foldersPath = path.join(path.resolve(), 'commands');
-const commandFolders = fs.readdirSync(foldersPath).filter(folder => path.basename(folder) !== "secret")
+const commandFolders = fs.readdirSync(foldersPath) //.filter(folder => path.basename(folder) !== "secret")
 
 for (const folder of commandFolders) {
 	const commandsPath = path.join(foldersPath, folder);
 	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+    const secret = (folder === 'secret')
+
     for (const file of commandFiles) {
         const filePath = path.join(commandsPath, file);
         const { commands } = await import(filePath);
-    
-        // Commands are a list of commands for each file
+
         for (const command of commands) {
             // Set a new item in the Collection with the key as the command name and the value as the exported module
             if ('data' in command && 'execute' in command) {
-                client.commands.set(command.data.name, command);
+                if (secret) {
+                    client.secretCommands.set(command.data.name, command);
+                } else {
+                    client.commands.set(command.data.name, command);
+                }
             } else {
                 console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
             }
@@ -86,8 +63,10 @@ for (const folder of commandFolders) {
     }
 }
 
-console.log(`Registered commands:"`)
+console.log(`Registered commands:`)
 console.log(client.commands.map(cmd => cmd.data.name))
+console.log(`Registered secret commands:`)
+console.log(client.secretCommands.map(cmd => cmd.data.name))
 
 function logHeader(msg) {
     return `[${msg.guild.name}][${msg.channel.name}]`
